@@ -40,6 +40,7 @@ class ListsTest(unittest.TestCase):
         self.assertEqual(res.list.from_name, "Bill")
         self.api.lists.delete(res.list.id)
 
+    @unittest.skip
     def test_contacts_upload(self):
         file_to_upload = os.path.split(os.path.abspath(__file__))[0] + os.path.sep + "emails.csv"
         existing_list = self.api.lists.create("Update", "Bob", "bob@acmetools.com")

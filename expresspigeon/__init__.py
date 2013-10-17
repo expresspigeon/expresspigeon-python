@@ -87,6 +87,6 @@ class ExpressPigeon(object):
         req = self.Request(url=ROOT + endpoint,
                            method=method.upper(),
                            headers={"X-auth-key": self.auth_key, "Content-type": content_type},
-                           data=body)
-        return json.loads(opener.open(req).read(), "UTF-8",
+                           data=body.encode("utf-8"))
+        return json.loads(opener.open(req).read().decode("utf-8"), "UTF-8",
                           object_hook=lambda d: namedtuple('EpResponse', d.keys())(*d.values()))
