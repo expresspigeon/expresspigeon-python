@@ -33,7 +33,7 @@ ERRORS = {400: BadRequest, 403: Forbidden, 404: NotFound, 500: InternalServerErr
 class ExpressPigeon(object):
 
     class Request(u2.Request):
-        METHODS = {"get", "post", "put", "delete"}
+        METHODS = ["get", "post", "put", "delete"]
 
         def __init__(self, url, method=None, headers=None, data=None, origin_req_host=None, unverifiable=False):
             if not headers:
