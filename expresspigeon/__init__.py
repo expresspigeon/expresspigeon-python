@@ -1,8 +1,12 @@
 import os
 import json
-import urllib2 as u2
 from collections import namedtuple
 from expresspigeon.lists import Lists
+
+try:
+    from urllib import request as url_lib
+except ImportError:
+    import urllib2 as url_lib
 
 
 class InvalidAuthKey(Exception):
@@ -32,20 +36,20 @@ ERRORS = {400: BadRequest, 403: Forbidden, 404: NotFound, 500: InternalServerErr
 
 class ExpressPigeon(object):
 
-    class Request(u2.Request):
+    class Request(url_lib.Request):
         METHODS = ["get", "post", "put", "delete"]
 
         def __init__(self, url, method=None, headers=None, data=None, origin_req_host=None, unverifiable=False):
             if not headers:
                 headers = {}
-            u2.Request.__init__(self, url, data, headers, origin_req_host, unverifiable)
+            url_lib.Request.__init__(self, url, data, headers, origin_req_host, unverifiable)
             self.method = method
 
         def get_method(self):
             if self.method:
                 return self.method
 
-            return u2.Request.get_method(self)
+            return url_lib.Request.get_method(self)
 
     def __init__(self, auth_key=None):
         """ Initialize the ExpressPigeon API client.
@@ -79,7 +83,7 @@ class ExpressPigeon(object):
         content_type = kwargs["content_type"] if "content_type" in kwargs else "application/json"
         body = kwargs["body"] if "body" in kwargs else json.dumps(kwargs["params"] if "params" in kwargs else {})
 
-        opener = u2.build_opener(u2.HTTPSHandler)
+        opener = url_lib.build_opener(url_lib.HTTPSHandler)
         req = self.Request(url=ROOT + endpoint,
                            method=method.upper(),
                            headers={"X-auth-key": self.auth_key, "Content-type": content_type},

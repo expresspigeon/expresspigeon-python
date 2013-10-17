@@ -46,7 +46,7 @@ class ListsTest(unittest.TestCase):
         res = self.api.lists.upload(existing_list.list.id, file_to_upload)
         self.assertEqual(res.status, "success")
         self.assertEqual(res.code, 200)
-        self.assertIsNotNone(res.upload_id)
+        self.assertTrue(res.upload_id is not None)
 
         report = self.api.lists.upload_status(res.upload_id).report
         self.assertEqual(report.suppressed, 0)
