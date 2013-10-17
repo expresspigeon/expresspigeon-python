@@ -1,0 +1,12 @@
+language: python
+python:
+- '2.6'
+- '2.7'
+- '3.2'
+- '3.3'
+script: nosetests
+env:
+  global:
+  - secure: mwehU55J3cVyDEkfbNOLJpAmRJVWCIZkOtf+Wi/vd1cbn4N7wIQ6vzbg7OMi+PxjYe61OyMsbvvVyE6eNZI/mGG+PqVfsCi6AarjQvGnQQpdJnuOvpQuCqxpBlXOGGZuiLAsBv33cXUJSzV0cZ5fM7fKjHPVYs42Q09UOHot7HA=
+  - secure: N4WvcXO4LFTyzUdQzd4FsULuwkdY1XQQwgOh5e5Xh9I3F9tHiTFqgb1W4Tn8HeBxp7TElcUJ5YJKQZaIhJ3kqUEp+f1tNj2KsyV4sbIivepLhsvzSpWDlIcb/rbGecJeJLLEWYuJwoou4W/Q+VWVNfZL9HcpdRucj5gauxCa/jQ=
+  - secure: B4hCcJ0SNyMuqGN9UbrDkzaYTf72l6FRBUn7YTscB2tmd4Cbrcc9E1xsPmdQPMxF8JEcS7OSXc4lCE8p8jpkCnURJLnEMlnOlbuT9tBqahhxqQGS0xghLE9xZm0YlEYxDup/VNAtdPorwzgwuc028RYEy9/RGJeOJ4rLIoxCwGQ=
