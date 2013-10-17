@@ -88,7 +88,7 @@ class Lists(object):
                 '--{0}'.format(boundary),
                 'Content-Disposition: form-data; name="contacts_file"',
                 '',
-                str(f.read()),
+                f.read().encode("UTF-8"),
             ))
 
             lines.extend((
