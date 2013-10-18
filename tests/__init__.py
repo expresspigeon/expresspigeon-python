@@ -42,7 +42,7 @@ class Gmail(object):
             return '\n'.join([self.__extract_body__(part.get_payload()) for part in payload])
 
     def get_unseen(self, removeAll=False):
-        messages = None
+        messages = []
         conn = imaplib.IMAP4_SSL("imap.gmail.com", 993)
         conn.login(os.environ['EXPRESSPIGEON_API_USER'], os.environ['EXPRESSPIGEON_API_PASSWORD'])
         conn.select()

@@ -1,5 +1,6 @@
 import os
 import unittest
+import time
 from tests import ExpressPigeonTest
 
 
@@ -40,26 +41,32 @@ class ListsTest(ExpressPigeonTest):
 
     def test_contacts_upload(self):
         file_to_upload = os.path.split(os.path.abspath(__file__))[0] + os.path.sep + "emails.csv"
-        existing_list = self.api.lists.create("Update", "Bob", "bob@acmetools.com")
+        # list name with last 4 digits from time
+        list_name = "Upload_{0}".format(str(round(time.time() * 1000))[-4:])
+        existing_list = self.api.lists.create(list_name, "Bob", "bob@acmetools.com")
         res = self.api.lists.upload(existing_list.list.id, file_to_upload)
         self.assertEqual(res.status, "success")
         self.assertEqual(res.code, 200)
         self.assertTrue(res.upload_id is not None)
 
-        report = self.api.lists.upload_status(res.upload_id).report
+        res = self.api.lists.upload_status(res.upload_id)
+        self.assertEqual(res.message, "upload complete")
+        self.assertEqual(res.status, "complete")
+        report = res.report
         self.assertEqual(report.suppressed, 0)
         self.assertEqual(report.skipped, 0)
-        self.assertEqual(report.list_name, "Update")
+        self.assertEqual(report.list_name, list_name)
         self.assertEqual(report.imported, 2)
 
-        messages = self.wait_until(lambda: self.gmail.get_unseen(removeAll=True), timeout=1)
+        messages = self.wait_until(lambda: self.gmail.get_unseen(), timeout=60)
         if messages:
-            self.assertEqual(len(messages), 1)
-            self.assertEqual(messages[0]["subject"], "Your contacts import was completed")
-            self.assertTrue("Contact upload report" in messages[0]["body"])
+            message = [m for m in messages if list_name in m["body"]]
+            self.assertEqual(len(message), 1)
+            self.assertEqual(message[0]["subject"], "Your contacts import was completed")
+            self.assertTrue("Contact upload report" in message[0]["body"])
             self.api.lists.delete(existing_list.list.id)
         else:
-            self.fail()
+            self.fail("Cannot read Gmail messages")
 
 if __name__ == '__main__':
     unittest.main()
