@@ -29,12 +29,11 @@ class InternalServerError(Exception):
     pass
 
 
-ROOT = "https://api.expresspigeon.com/"
-
 ERRORS = {400: BadRequest, 403: Forbidden, 404: NotFound, 500: InternalServerError}
 
 
 class ExpressPigeon(object):
+    ROOT = "https://api.expresspigeon.com/"
 
     class Request(url_lib.Request):
         METHODS = ["get", "post", "put", "delete"]
@@ -84,9 +83,16 @@ class ExpressPigeon(object):
         body = kwargs["body"] if "body" in kwargs else json.dumps(kwargs["params"] if "params" in kwargs else {})
 
         opener = url_lib.build_opener(url_lib.HTTPSHandler)
-        req = self.Request(url=ROOT + endpoint,
+
+        req = self.Request(url=(self.ROOT if self.ROOT.endswith("/") else self.ROOT + "/") + endpoint,
                            method=method.upper(),
                            headers={"X-auth-key": self.auth_key, "Content-type": content_type},
                            data=body.encode("utf-8"))
+
+        self.request_hook(req)
+
         return json.loads(opener.open(req).read().decode("utf-8"), "UTF-8",
                           object_hook=lambda d: namedtuple('EpResponse', d.keys())(*d.values()))
+
+    def request_hook(self, request):
+        pass

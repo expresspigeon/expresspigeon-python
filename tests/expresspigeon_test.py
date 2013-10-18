@@ -1,11 +1,9 @@
 import os
 import unittest
-from expresspigeon import ExpressPigeon
+from tests import ExpressPigeonTest
 
 
-class ListsTest(unittest.TestCase):
-    def setUp(self):
-        self.api = ExpressPigeon()
+class ListsTest(ExpressPigeonTest):
 
     def test_create_new_list(self):
         res = self.api.lists.create(name="Active customers", from_name="Bob", reply_to="bob@acmetools.com")
@@ -40,7 +38,7 @@ class ListsTest(unittest.TestCase):
         self.assertEqual(res.list.from_name, "Bill")
         self.api.lists.delete(res.list.id)
 
-    def skip_contacts_upload(self):
+    def test_contacts_upload(self):
         file_to_upload = os.path.split(os.path.abspath(__file__))[0] + os.path.sep + "emails.csv"
         existing_list = self.api.lists.create("Update", "Bob", "bob@acmetools.com")
         res = self.api.lists.upload(existing_list.list.id, file_to_upload)
@@ -54,7 +52,14 @@ class ListsTest(unittest.TestCase):
         self.assertEqual(report.list_name, "Update")
         self.assertEqual(report.imported, 2)
 
-        self.api.lists.delete(existing_list.list.id)
+        messages = self.wait_until(lambda: self.gmail.get_unseen(removeAll=True), timeout=1)
+        if messages:
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0]["subject"], "Your contacts import was completed")
+            self.assertTrue("Contact upload report" in messages[0]["body"])
+            self.api.lists.delete(existing_list.list.id)
+        else:
+            self.fail()
 
 if __name__ == '__main__':
     unittest.main()

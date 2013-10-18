@@ -1,7 +1,7 @@
 import os
 from setuptools import setup, find_packages
 
-long_description = open(os.path.join(os.path.dirname(__file__), 'README')).read()
+long_description = open(os.path.join(os.path.dirname(__file__), 'README.md')).read()
 
 setup(name='ExpressPigeon',
       version='0.0.1',
@@ -10,8 +10,8 @@ setup(name='ExpressPigeon',
       author='Gleb Galkin',
       author_email='gleb@expresspigeon.com',
       license='BSD',
-      packages = find_packages('expresspigeon', exclude = ['*.tests', '*.tests.*', 'tests.*', 'tests']),
-      package_dir = {'': 'expresspigeon'},
+      packages=find_packages('expresspigeon', exclude=['*.tests', '*.tests.*', 'tests.*', 'tests']),
+      package_dir={'': 'expresspigeon'},
       keywords=' '.join(['expresspigeon',
                          'api',
                          'email',

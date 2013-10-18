@@ -1,3 +1,4 @@
+import os
 import random
 import string
 
@@ -86,9 +87,10 @@ class Lists(object):
             lines = []
             lines.extend((
                 '--{0}'.format(boundary),
-                'Content-Disposition: form-data; name="contacts_file"',
+                'Content-Disposition: form-data; name="contacts_file"; contacts_file="{0}"'
+                .format(os.path.basename(contacts_file)),
                 '',
-                str(f.read()),
+                str(f.read())
             ))
 
             lines.extend((
