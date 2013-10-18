@@ -15,7 +15,7 @@ except ImportError:
 class ExpressPigeonTest(unittest.TestCase):
     def request_hook(self, request):
         user_and_password = base64.b64encode("%s:%s".format(os.environ['EXPRESSPIGEON_USER'],
-                                                            os.environ['EXPRESSPIGEON_PASSWORD']))
+                                                            os.environ['EXPRESSPIGEON_PASSWORD']).encode("utf-8"))
         request.add_header('Authorization', 'Basic %s' % user_and_password)
 
     def setUp(self):
@@ -42,7 +42,7 @@ class Gmail(object):
             return '\n'.join([self.__extract_body__(part.get_payload()) for part in payload])
 
     def get_unseen(self, removeAll=False):
-        messages = []
+        messages = None
         conn = imaplib.IMAP4_SSL("imap.gmail.com", 993)
         conn.login(os.environ['EXPRESSPIGEON_API_USER'], os.environ['EXPRESSPIGEON_API_PASSWORD'])
         conn.select()
