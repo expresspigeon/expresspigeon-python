@@ -13,7 +13,7 @@ class Lists(object):
     def __init__(self, ep):
         self.ep = ep
 
-    def get_all(self):
+    def find_all(self):
         """ Query all lists
 
         :returns: List of JSON of all lists for user
@@ -26,13 +26,13 @@ class Lists(object):
         """ Create a list
 
         :param name: Name of a newly created list
-        :type name: string
+        :type name: str
 
         :param from_name: Default "from" name used when sending campaigns to this list
-        :type from_name: string
+        :type from_name: str
 
         :param reply_to: Default Reply To email address used when sending campaigns to this list
-        :type reply_to: string
+        :type reply_to: str
 
         :returns: ContactList object
         :rtype: EpResponse
@@ -52,7 +52,7 @@ class Lists(object):
         :rtype: EpResponse
 
         """
-        return self.ep.delete('%s/%d' % (self.endpoint, list_id))
+        return self.ep.delete('{0}/{1}'.format(self.endpoint, list_id))
 
     def update(self, list_id, params):
         """ Updates existing list
@@ -76,7 +76,7 @@ class Lists(object):
         :type list_id: int
 
         :param contacts_file: Absolute path to the CSV file with contacts
-        :type contacts_file: string
+        :type contacts_file: str
 
         :returns: EpResponse with status, code, and upload_id field
         :rtype: EpResponse

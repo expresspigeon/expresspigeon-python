@@ -1,6 +1,8 @@
 import os
 import json
 from collections import namedtuple
+from expresspigeon.campaigns import Campaigns
+from expresspigeon.contacts import Contacts
 from expresspigeon.lists import Lists
 
 try:
@@ -13,23 +15,8 @@ class InvalidAuthKey(Exception):
     pass
 
 
-class BadRequest(Exception):
+class ExpressPigeonException(Exception):
     pass
-
-
-class Forbidden(Exception):
-    pass
-
-
-class NotFound(Exception):
-    pass
-
-
-class InternalServerError(Exception):
-    pass
-
-
-ERRORS = {400: BadRequest, 403: Forbidden, 404: NotFound, 500: InternalServerError}
 
 
 class ExpressPigeon(object):
@@ -70,15 +57,20 @@ class ExpressPigeon(object):
 
         self.auth_key = auth_key
         self.lists = Lists(self)
+        self.contacts = Contacts(self)
+        self.campaigns = Campaigns(self)
 
     def __getattr__(self, name):
+        """
+        This is metaprogramming trick to send get, post, put, delete requests implicitly
+        """
         return (
-            lambda endpoint, **kwargs: self.__call__(endpoint, name, **kwargs)
+            lambda endpoint, **kwargs: self.__send_request__(endpoint, name, **kwargs)
             if name in self.Request.METHODS
             else super(ExpressPigeon, self).__getattribute__(name)
         )
 
-    def __call__(self, endpoint, method, **kwargs):
+    def __send_request__(self, endpoint, method, **kwargs):
         content_type = kwargs["content_type"] if "content_type" in kwargs else "application/json"
         body = kwargs["body"] if "body" in kwargs else json.dumps(kwargs["params"] if "params" in kwargs else {})
 
@@ -91,8 +83,12 @@ class ExpressPigeon(object):
 
         self.request_hook(req)
 
-        return json.loads(opener.open(req).read().decode("utf-8"), "UTF-8",
-                          object_hook=lambda d: namedtuple('EpResponse', d.keys())(*d.values()))
+        try:
+            return json.loads(opener.open(req).read().decode("utf-8"), "UTF-8",
+                              object_hook=lambda d: namedtuple('EpResponse', d.keys())(*d.values()))
+        except url_lib.HTTPError as e:
+            return json.loads(e.fp.read().decode("utf-8"), "UTF-8",
+                              object_hook=lambda d: namedtuple('EpResponse', d.keys())(*d.values()))
 
     def request_hook(self, request):
         pass
