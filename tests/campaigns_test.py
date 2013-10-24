@@ -19,7 +19,7 @@ class CampaignsTest(ExpressPigeonTest):
 
     def test_get_all_campaigns(self):
         res = self.api.campaigns.get_all()
-        self.assertIsNotNone(res)
+        self.assertTrue(res is not None)
         self.assertIsInstance(res, list)
 
     def test_send_without_params(self):
@@ -76,7 +76,7 @@ class CampaignsTest(ExpressPigeonTest):
         self.assertEqual(res.code, 200)
         self.assertEqual(res.status, "success")
         self.assertEqual(res.message, "new campaign created successfully")
-        self.assertIsNotNone(res.campaign_id)
+        self.assertTrue(res.campaign_id is not None)
 
         report = self.api.campaigns.report(res.campaign_id)
         self.assertEquals(report.delivered, 0)
