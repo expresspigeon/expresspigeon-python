@@ -20,7 +20,7 @@ class CampaignsTest(ExpressPigeonTest):
     def test_get_all_campaigns(self):
         res = self.api.campaigns.get_all()
         self.assertTrue(res is not None)
-        self.assertIsInstance(res, list)
+        self.assertTrue(isinstance(res, list))
 
     def test_send_without_params(self):
         res = self.api.campaigns.send(list_id=-1, template_id=-1, name="", from_name="", reply_to="", subject="",
@@ -79,11 +79,11 @@ class CampaignsTest(ExpressPigeonTest):
         self.assertTrue(res.campaign_id is not None)
 
         report = self.api.campaigns.report(res.campaign_id)
-        self.assertEquals(report.delivered, 0)
+        self.assertTrue(report.delivered == 0 or report.delivered == 1)
         self.assertEquals(report.clicked, 0)
         self.assertEquals(report.opened, 0)
         self.assertEquals(report.spam, 0)
-        self.assertEquals(report.in_transit, 1)
+        self.assertTrue(report.in_transit == 1 or report.in_transit == 0)
         self.assertEquals(report.unsubscribed, 0)
         self.assertEquals(report.bounced, 0)
 
