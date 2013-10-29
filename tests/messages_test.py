@@ -1,7 +1,7 @@
 import os
 import datetime
 import pytz
-from tests import ExpressPigeonTest, Zone
+from tests import ExpressPigeonTest
 
 
 class MessagesTest(ExpressPigeonTest):
