@@ -27,4 +27,5 @@ setup(name='ExpressPigeon',
           'Topic :: Communications :: Email',
           'Topic :: Software Development :: Libraries',
           'Topic :: Software Development :: Libraries :: Python Modules'
-      ])
+      ],
+      tests_require=['pytz'])

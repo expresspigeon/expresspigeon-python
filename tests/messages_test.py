@@ -153,4 +153,4 @@ class MessagesTest(ExpressPigeonTest):
         if len(report) == 1:
             return report[0]
         elif len(report) == 0:
-            self.__get_report_by_id__(message_id, page + 1)
+            return self.__get_report_by_id__(message_id, page + 1)
