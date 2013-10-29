@@ -46,7 +46,7 @@ class CampaignsTest(ExpressPigeonTest):
         self.assertEqual(res.message, "template=-1 is not found")
 
     def test_send_with_non_existent_list(self):
-        res = self.api.campaigns.send(list_id=-1, template_id=347, name="My Campaign", from_name="John",
+        res = self.api.campaigns.send(list_id=-1, template_id=self.template_id, name="My Campaign", from_name="John",
                                       reply_to="j@j.j",
                                       subject="Hi", google_analytics=False)
         self.assertEqual(res.code, 400)
@@ -54,7 +54,7 @@ class CampaignsTest(ExpressPigeonTest):
         self.assertEqual(res.message, "list=-1 is not found")
 
     def test_send_with_disabled_list(self):
-        res = self.api.campaigns.send(list_id=130, template_id=347, name="My Campaign", from_name="John",
+        res = self.api.campaigns.send(list_id=130, template_id=self.template_id, name="My Campaign", from_name="John",
                                       reply_to="j@j.j",
                                       subject="Hi", google_analytics=False)
         self.assertEqual(res.code, 400)
@@ -70,7 +70,7 @@ class CampaignsTest(ExpressPigeonTest):
     def test_send_successful_campaign(self):
         list_resp = self.api.lists.create("My list", "John", os.environ['EXPRESSPIGEON_API_USER'])
         self.api.contacts.upsert(list_resp.list.id, {"email": os.environ['EXPRESSPIGEON_API_USER']})
-        res = self.api.campaigns.send(list_id=list_resp.list.id, template_id=347, name="My Campaign", from_name="John",
+        res = self.api.campaigns.send(list_id=list_resp.list.id, template_id=self.template_id, name="My Campaign", from_name="John",
                                       reply_to=os.environ['EXPRESSPIGEON_API_USER'], subject="Hi",
                                       google_analytics=False)
         self.assertEqual(res.code, 200)
@@ -92,7 +92,7 @@ class CampaignsTest(ExpressPigeonTest):
 
     def test_schedule_campaign_with_bad_date(self):
         list_resp = self.api.lists.create("My list", "John", os.environ['EXPRESSPIGEON_API_USER'])
-        res = self.api.campaigns.schedule(list_id=list_resp.list.id, template_id=347, name="My Campaign", from_name="John",
+        res = self.api.campaigns.schedule(list_id=list_resp.list.id, template_id=self.template_id, name="My Campaign", from_name="John",
                                           reply_to=os.environ['EXPRESSPIGEON_API_USER'], subject="Hi",
                                           google_analytics=False, schedule_for="2013-05-28")
         self.assertEqual(res.code, 400)
@@ -103,7 +103,7 @@ class CampaignsTest(ExpressPigeonTest):
 
     def test_schedule_campaign_with_date_in_the_past(self):
         list_resp = self.api.lists.create("My list", "John", os.environ['EXPRESSPIGEON_API_USER'])
-        res = self.api.campaigns.schedule(list_id=list_resp.list.id, template_id=347, name="My Campaign", from_name="John",
+        res = self.api.campaigns.schedule(list_id=list_resp.list.id, template_id=self.template_id, name="My Campaign", from_name="John",
                                           reply_to=os.environ['EXPRESSPIGEON_API_USER'], subject="Hi",
                                           google_analytics=False, schedule_for="2013-05-28T17:19:50.779+0300")
         self.assertEqual(res.code, 400)

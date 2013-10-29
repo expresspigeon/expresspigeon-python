@@ -73,9 +73,6 @@ class ListsTest(ExpressPigeonTest):
         self.assertEqual(res.code, 404)
         self.assertEqual(res.message, "list=-1 not found")
 
-    def enabled_list_removal(self):
-        pass #TODO
-
     def test_remove_disabled_list(self):
         res = self.api.lists.delete(130)
         self.assertEqual(res.code, 400)
@@ -88,7 +85,7 @@ class ListsTest(ExpressPigeonTest):
         self.assertEqual(res.status, "error")
         self.assertEqual(res.message, "you must provide list_id in URL")
 
-    def test_upload_with_non_existen_id(self):
+    def test_upload_with_non_existent_id(self):
         res = self.api.lists.upload(-1, self.file_to_upload)
         self.assertEqual(res.code, 404)
         self.assertEqual(res.message, "list=-1 not found")

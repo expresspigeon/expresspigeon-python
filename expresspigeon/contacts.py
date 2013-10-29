@@ -20,21 +20,6 @@ class Contacts(object):
         """
         return self.ep.post(self.endpoint, params={"list_id": list_id, "contact": contact})
 
-    def find_all(self, list_id, page, page_size):
-        """Returns an array of contacts from specified page.
-
-        :param list_id: A list id to select contacts from or "suppress_list" to select suppressed contacts.
-        :type list_id: str
-
-        :param page: Page number to be selected indexed starting at 0.
-        :type page: int
-
-        :param page_size: Desired size of page to be selected.
-        :type page_size: int
-        """
-
-        return self.ep.get('lists/{0}/{1}?page={2}&page_size={3}'.format(list_id, self.endpoint, page, page_size))
-
     def find_by_email(self, email):
         """ Returns a single contact by email address.
 
@@ -58,3 +43,15 @@ class Contacts(object):
         query = "{0}?email={1}".format(self.endpoint, email) if list_id is None \
             else "{0}?email={1}&list_id={2}".format(self.endpoint, email, list_id)
         return self.ep.delete(query)
+
+    def export_csv(self, list_id):
+        """ Returns everything as :class:`str`
+
+        :param list_id: list id to export as csv
+        :type list_id: str
+
+        :returns: response as is
+        :rtype: str or EpResponse
+        """
+
+        return self.ep.read_stream("{0}/export_csv/{1}".format(self.endpoint, list_id))

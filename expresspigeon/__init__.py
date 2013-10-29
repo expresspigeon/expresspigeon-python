@@ -4,6 +4,8 @@ from collections import namedtuple
 from expresspigeon.campaigns import Campaigns
 from expresspigeon.contacts import Contacts
 from expresspigeon.lists import Lists
+from expresspigeon.messages import Messages
+from expresspigeon.templates import Templates
 
 try:
     from urllib import request as url_lib
@@ -59,6 +61,8 @@ class ExpressPigeon(object):
         self.lists = Lists(self)
         self.contacts = Contacts(self)
         self.campaigns = Campaigns(self)
+        self.messages = Messages(self)
+        self.templates = Templates(self)
 
     def __getattr__(self, name):
         """
@@ -86,6 +90,20 @@ class ExpressPigeon(object):
         try:
             return json.loads(opener.open(req).read().decode("utf-8"), "UTF-8",
                               object_hook=lambda d: namedtuple('EpResponse', d.keys())(*d.values()))
+        except url_lib.HTTPError as e:
+            return json.loads(e.fp.read().decode("utf-8"), "UTF-8",
+                              object_hook=lambda d: namedtuple('EpResponse', d.keys())(*d.values()))
+
+    def read_stream(self, endpoint, **kwargs):
+        opener = url_lib.build_opener(url_lib.HTTPSHandler)
+
+        req = self.Request(url=(self.ROOT if self.ROOT.endswith("/") else self.ROOT + "/") + endpoint,
+                           method="GET", headers={"X-auth-key": self.auth_key})
+
+        self.request_hook(req)
+
+        try:
+            return opener.open(req).read().decode("utf-8")
         except url_lib.HTTPError as e:
             return json.loads(e.fp.read().decode("utf-8"), "UTF-8",
                               object_hook=lambda d: namedtuple('EpResponse', d.keys())(*d.values()))
