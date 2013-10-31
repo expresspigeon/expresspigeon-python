@@ -10,6 +10,9 @@ class Campaigns(object):
 
     def get_all(self):
         """ Return an array of all campaigns IDs
+
+        :returns: list of campaigns ids
+        :rtype: list
         """
         return self.ep.get(self.endpoint)
 
@@ -43,6 +46,8 @@ class Campaigns(object):
         Should be true or false.
         :type google_analytics: bool
 
+        :returns: EpResponse with campaign_id field
+        :rtype: EpResponse
         """
         return self.ep.post(self.endpoint, params={'list_id': list_id, 'template_id': template_id, 'name': name,
                                                    'from_name': from_name, 'reply_to': reply_to, 'subject': subject,
@@ -81,7 +86,7 @@ class Campaigns(object):
         and should be in the future.
         :type schedule_for: str
 
-        :returns: campaign_id field
+        :returns: EpResponse with campaign_id field
         :rtype: EpResponse
         """
 

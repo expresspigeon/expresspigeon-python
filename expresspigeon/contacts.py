@@ -17,6 +17,9 @@ class Contacts(object):
 
         :param contact: Dictionary describes new contact. The "email" field is required.
         :type contact: dict
+
+        :returns: EpResponse with JSON representation of a contact
+        :rtype: EpResponse
         """
         return self.ep.post(self.endpoint, params={"list_id": list_id, "contact": contact})
 
@@ -25,6 +28,27 @@ class Contacts(object):
 
         :param email: Email of contact to be selected.
         :type email: str
+
+        :returns: EpResponse with all contact fields, e.g.
+        {
+             "custom_fields": {
+                 "my custom field": "custom value"
+             },
+            "first_name": "Bob",
+            "email": "bob@example.net",
+           "email_format": "html",
+           "created_at": "2012-10-29T14:17:58.000+0000",
+           "updated_at": "2013-01-24T08:20:52.000+0000",
+           "status": "ENGAGED"
+           "lists": [
+             {
+               "id": 1
+             },
+             {
+               "id": 2
+             }]
+        }
+        :rtype: EpResponse
         """
 
         return self.ep.get("{0}?email={1}".format(self.endpoint, email))
