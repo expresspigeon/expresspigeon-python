@@ -118,3 +118,15 @@ class Lists(object):
         :rtype: EpResponse
         """
         return self.ep.get('{0}/{1}/{2}'.format(self.endpoint, 'upload_status', upload_id))
+
+    def csv(self, list_id):
+        """ Returns contacts as CSV
+
+        :param list_id: list id to export as csv
+        :type list_id: str
+
+        :returns: response as is
+        :rtype: str or EpResponse
+        """
+
+        return self.ep.read_stream("{0}/{1}/csv".format(self.endpoint, list_id))

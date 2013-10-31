@@ -67,15 +67,3 @@ class Contacts(object):
         query = "{0}?email={1}".format(self.endpoint, email) if list_id is None \
             else "{0}?email={1}&list_id={2}".format(self.endpoint, email, list_id)
         return self.ep.delete(query)
-
-    def export_csv(self, list_id):
-        """ Returns everything as :class:`str`
-
-        :param list_id: list id to export as csv
-        :type list_id: str
-
-        :returns: response as is
-        :rtype: str or EpResponse
-        """
-
-        return self.ep.read_stream("{0}/export_csv/{1}".format(self.endpoint, list_id))

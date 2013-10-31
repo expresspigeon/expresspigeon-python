@@ -107,7 +107,7 @@ class Campaigns(object):
         :rtype: EpResponse
         """
 
-        return self.ep.get("{0}/report/{1}".format(self.endpoint, campaign_id))
+        return self.ep.get("{0}/{1}".format(self.endpoint, campaign_id))
 
     def bounced(self, campaign_id):
         """ Returns bounced contacts
@@ -119,7 +119,7 @@ class Campaigns(object):
         :rtype: EpResponse
         """
 
-        return self.ep.get("{0}/bounced/{1}".format(self.endpoint, campaign_id))
+        return self.ep.get("{0}/{1}/bounced".format(self.endpoint, campaign_id))
 
     def unsubscribed(self, campaign_id):
         """ Returns unsubscribed contacts
@@ -131,7 +131,7 @@ class Campaigns(object):
         :rtype: EpResponse
         """
 
-        return self.ep.get("{0}/unsubscribed/{1}".format(self.endpoint, campaign_id))
+        return self.ep.get("{0}/{1}/unsubscribed".format(self.endpoint, campaign_id))
 
     def spam(self, campaign_id):
         """ Returns contacts that mark campaign as spam
@@ -143,4 +143,4 @@ class Campaigns(object):
         :rtype: EpResponse
         """
 
-        return self.ep.get("{0}/spam/{1}".format(self.endpoint, campaign_id))
+        return self.ep.get("{0}/{1}/spam".format(self.endpoint, campaign_id))

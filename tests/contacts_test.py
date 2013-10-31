@@ -77,13 +77,13 @@ class ContactsTest(ExpressPigeonTest):
         self.api.lists.delete(list_response.list.id)
 
     def test_export_contacts_from_list_without_list_id(self):
-        res = self.api.contacts.export_csv("")
+        res = self.api.lists.csv("-1")
         self.assertEqual(res.code, 404)
         self.assertEqual(res.status, "error")
-        self.assertEqual(res.message, "list=null not found")
+        self.assertEqual(res.message, "list=-1 not found")
 
     def test_get_contacts_from_suppress_list(self):
-        res = self.api.contacts.export_csv("suppress_list").split('\n')
+        res = self.api.lists.csv("suppress_list").split('\n')
         self.assertEqual(len(res), 2)
         self.assertEqual(res[1], '"suppressed@e.e","Suppressed","Doe",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,')
 
@@ -151,32 +151,14 @@ class ContactsTest(ExpressPigeonTest):
         self.assertEqual(res.status, "success")
         self.assertEqual(res.message, "contact=mary@e.e deleted successfully")
 
-        contacts_exported = self.api.contacts.export_csv(list_response.list.id).split("\n")
+        contacts_exported = self.api.lists.csv(list_response.list.id).split("\n")
         self.assertEqual(len(contacts_exported), 1)
-        contact_exported_2 = self.api.contacts.export_csv(list_response_2.list.id).split("\n")
+        contact_exported_2 = self.api.lists.csv(list_response_2.list.id).split("\n")
         self.assertEqual(len(contact_exported_2), 2)
         self.assertEqual(contact_exported_2[1], '"mary@e.e",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,')
 
         self.api.lists.delete(list_response.list.id)
         self.api.lists.delete(list_response_2.list.id)
-        self.api.contacts.delete("mary@e.e")
-
-    def test_export_csv(self):
-        list_response = self.api.lists.create("My List", "a@a.a", "a@a.a")
-        self.api.contacts.upsert(list_response.list.id, {"email": "mary@e.e"})
-
-        res = self.api.contacts.export_csv(list_response.list.id).split("\n")
-        self.assertEquals(len(res), 2)
-        headers = '"Email", "First name", "Last name", "City", "Phone", "Company", "Title", "Address 1", "Address 2", ' \
-                  '"State", "Zip", "Country", "Date of birth", "custom_field_1", "custom_field_10", "custom_field_11", ' \
-                  '"custom_field_12", "custom_field_13", "custom_field_18", "custom_field_19", "custom_field_2", ' \
-                  '"custom_field_20", "custom_field_21", "custom_field_22", "custom_field_23", "custom_field_24", ' \
-                  '"custom_field_3", "custom_field_4", "custom_field_5", "custom_field_6", "custom_field_7", ' \
-                  '"custom_field_8", "custom_field_9"'
-        self.assertEquals(res[0], headers)
-        self.assertEquals(res[1], '"mary@e.e",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,')
-
-        self.api.lists.delete(list_response.list.id)
         self.api.contacts.delete("mary@e.e")
 
 if __name__ == '__main__':
