@@ -27,6 +27,9 @@ class ExpressPigeonTest(unittest.TestCase):
         ExpressPigeon.request_hook = self.request_hook
         self.api = ExpressPigeon()
 
+    def tearDown(self):
+        time.sleep(5)
+
     def wait_until(self, predicate, timeout, period=0.5, **kwargs):
 
         must_end = time.time() + timeout

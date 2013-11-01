@@ -5,7 +5,7 @@ python:
 - '3.2'
 - '3.3'
 install: 'pip install pytz'
-script: nosetests -d
+script: nosetests
 env:
   global:
   - secure: gaJAME9M4oSiZHDzIT0gEM56ZVMd4phXmDk/2h9rWAqPsd6cZAiE3OZtyfJWUsc9yCk51CaGJjz7QQjL02+Qq10r6GhczhzzwyxhbW7eN1Nc8gEOIHw8rJXIEmcH5kyCdNisGFKGkzgaQxXUFqC+eUXZoxfNBEQGNcSYmMszY8M=
