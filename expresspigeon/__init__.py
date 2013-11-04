@@ -1,7 +1,7 @@
 import os
 import json
 from collections import namedtuple
-from expresspigeon.autoresponders import Autoresponders
+from expresspigeon.autoresponders import AutoResponders
 from expresspigeon.campaigns import Campaigns
 from expresspigeon.contacts import Contacts
 from expresspigeon.lists import Lists
@@ -64,7 +64,7 @@ class ExpressPigeon(object):
         self.campaigns = Campaigns(self)
         self.messages = Messages(self)
         self.templates = Templates(self)
-        self.autoresponders = Autoresponders(self)
+        self.auto_responders = AutoResponders(self)
 
     def __getattr__(self, name):
         """
