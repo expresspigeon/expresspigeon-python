@@ -93,3 +93,17 @@ class Gmail(object):
                     messages.append({'subject': msg['subject'], 'body': self.__extract_body__(msg.get_payload())})
 
         return messages
+
+    def delete_by_subject(self, subject):
+        conn = imaplib.IMAP4_SSL("imap.gmail.com", 993)
+        conn.login(os.environ['EXPRESSPIGEON_API_USER'], os.environ['EXPRESSPIGEON_API_PASSWORD'])
+        conn.select("INBOX")
+        email_ids = conn.search(None, '(SUBJECT "{0}")'.format(subject))[1][0].split(" ")
+
+        if len(email_ids) == 0:
+            return False
+
+        for email in email_ids:
+            conn.store(email, '+FLAGS', '\\Deleted')
+
+        return True if len(conn.search(None, '(SUBJECT "{0}")'.format(subject))[1][0].split(" ")) == 0 else False

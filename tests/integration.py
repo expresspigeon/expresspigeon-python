@@ -172,3 +172,34 @@ class IntegrationTest(ExpressPigeonTest):
 
         self.api.contacts.delete(os.environ['EXPRESSPIGEON_API_USER'])
         self.api.lists.delete(list_resp.list.id)
+
+    def test_auto_responders(self):
+        list_resp = self.api.lists.create("My list", "John", os.environ['EXPRESSPIGEON_API_USER'])
+        self.api.contacts.upsert(list_resp.list.id, {"email": os.environ['EXPRESSPIGEON_API_USER']})
+        auto_responder = list(filter(lambda auto_responder: auto_responder.name == 'Test',
+                                     self.api.auto_responders.find_all()))[0]
+        try:
+            old_report = self.api.auto_responders.report(auto_responder.auto_responder_id)[0]
+
+            auto_responder_res = self.api.auto_responders.start(auto_responder.auto_responder_id,
+                                                                os.environ['EXPRESSPIGEON_API_USER'])
+            self.assertEquals(auto_responder_res.code, 200)
+            self.assertEquals(auto_responder_res.status, "success")
+            self.assertEquals(auto_responder_res.message,
+                              "auto_responder={0} started successfully for contact={1}".format(
+                                  auto_responder.auto_responder_id,
+                                  os.environ['EXPRESSPIGEON_API_USER']))
+
+            email = self.wait_until(self.gmail.get_by_subject, 300,
+                                    subject=auto_responder.auto_responder_parts[0].subject)
+            self.assertTrue(email is not None)
+            self.__emulate_browser_open_and_click__(email[0]['body'])
+
+            report = self.api.auto_responders.report(auto_responder.auto_responder_id)[0]
+            self.assertEquals(report.delivered, old_report.delivered + 1)
+            self.assertEquals(report.clicked, old_report.clicked + 1)
+            self.assertEquals(report.opened, old_report.opened + 1)
+        finally:
+            self.api.contacts.delete(os.environ['EXPRESSPIGEON_API_USER'])
+            self.api.lists.delete(list_resp.list.id)
+            self.gmail.delete_by_subject(subject=auto_responder.auto_responder_parts[0].subject)

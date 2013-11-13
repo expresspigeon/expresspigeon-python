@@ -9,16 +9,16 @@ class AutoRespondersTest(ExpressPigeonTest):
 
     def test_auto_responder_start(self):
         auto_responder = list(filter(lambda auto_responder: auto_responder[2] == 'Test',
-                                     self.api.auto_responders.find_all()))
+                                     self.api.auto_responders.find_all()))[0]
 
         list_resp = self.api.lists.create("My list", "John", os.environ['EXPRESSPIGEON_API_USER'])
         self.api.contacts.upsert(list_resp.list.id, {"email": os.environ['EXPRESSPIGEON_API_USER']})
 
-        res = self.api.auto_responders.start(auto_responder[0][1], os.environ['EXPRESSPIGEON_API_USER'])
+        res = self.api.auto_responders.start(auto_responder.auto_responder_id, os.environ['EXPRESSPIGEON_API_USER'])
         self.assertEquals(res.code, 200)
         self.assertEquals(res.status, "success")
         self.assertEquals(res.message, "auto_responder={0} started successfully for contact={1}".format(
-            auto_responder[0][1],
+            auto_responder.auto_responder_id,
             os.environ['EXPRESSPIGEON_API_USER']))
 
         self.api.contacts.delete(os.environ['EXPRESSPIGEON_API_USER'])
@@ -31,43 +31,43 @@ class AutoRespondersTest(ExpressPigeonTest):
         self.assertEquals(res.message, "auto_responder=-1 not found")
 
     def test_start_disabled_auto_responder(self):
-        auto_responder = list(filter(lambda auto_responder: auto_responder[2] == 'Disabled Autoresponder',
-                                     self.api.auto_responders.find_all()))
+        auto_responder = list(filter(lambda auto_responder: auto_responder.name == 'Disabled Autoresponder',
+                                     self.api.auto_responders.find_all()))[0]
 
-        res = self.api.auto_responders.start(auto_responder[0][1], "")
+        res = self.api.auto_responders.start(auto_responder.auto_responder_id, "")
         self.assertEquals(res.code, 400)
         self.assertEquals(res.status, "error")
-        self.assertEquals(res.message, "auto_responder={0} disabled".format(auto_responder[0][1]))
+        self.assertEquals(res.message, "auto_responder={0} disabled".format(auto_responder.auto_responder_id))
 
     def test_start_without_email(self):
-        auto_responder = list(filter(lambda auto_responder: auto_responder[2] == 'Test',
-                                     self.api.auto_responders.find_all()))
+        auto_responder = list(filter(lambda auto_responder: auto_responder.name == 'Test',
+                                     self.api.auto_responders.find_all()))[0]
 
-        res = self.api.auto_responders.start(auto_responder[0][1], "")
+        res = self.api.auto_responders.start(auto_responder.auto_responder_id, "")
         self.assertEquals(res.code, 400)
         self.assertEquals(res.status, "error")
         self.assertEquals(res.message, "'email' required")
 
     def test_start_with_non_existent_email(self):
-        auto_responder = list(filter(lambda auto_responder: auto_responder[2] == 'Test',
-                                     self.api.auto_responders.find_all()))
+        auto_responder = list(filter(lambda auto_responder: auto_responder.name == 'Test',
+                                     self.api.auto_responders.find_all()))[0]
 
-        res = self.api.auto_responders.start(auto_responder[0][1], "non_existent_email@e.e")
+        res = self.api.auto_responders.start(auto_responder.auto_responder_id, "non_existent_email@e.e")
         self.assertEquals(res.code, 404)
         self.assertEquals(res.status, "error")
         self.assertEquals(res.message, "contact=non_existent_email@e.e not found")
 
     def test_start_without_newsletter(self):
-        auto_responder = list(filter(lambda auto_responder: auto_responder[2] == 'No newsletter',
-                                     self.api.auto_responders.find_all()))
+        auto_responder = list(filter(lambda auto_responder: auto_responder.name == 'No newsletter',
+                                     self.api.auto_responders.find_all()))[0]
 
         list_resp = self.api.lists.create("My list", "John", os.environ['EXPRESSPIGEON_API_USER'])
         self.api.contacts.upsert(list_resp.list.id, {"email": os.environ['EXPRESSPIGEON_API_USER']})
 
-        res = self.api.auto_responders.start(auto_responder[0][1], os.environ['EXPRESSPIGEON_API_USER'])
+        res = self.api.auto_responders.start(auto_responder.auto_responder_id, os.environ['EXPRESSPIGEON_API_USER'])
         self.assertEquals(res.code, 400)
         self.assertEquals(res.status, "error")
-        self.assertEquals(res.message, "auto_responder={0} does not have any newsletters".format(auto_responder[0][1]))
+        self.assertEquals(res.message, "auto_responder={0} does not have any newsletters".format(auto_responder.auto_responder_id))
 
         self.api.contacts.delete(os.environ['EXPRESSPIGEON_API_USER'])
         self.api.lists.delete(list_resp.list.id)
@@ -80,9 +80,9 @@ class AutoRespondersTest(ExpressPigeonTest):
         self.assertEquals(res.message, "auto_responder=-1 not found")
 
     def test_report(self):
-        auto_responders = self.api.auto_responders.find_all()
-        res = self.api.auto_responders.report(auto_responders[0][1])[0]
-        self.assertEquals(res.auto_responder_part_id, auto_responders[0][1])
+        auto_responder = self.api.auto_responders.find_all()[0]
+        res = self.api.auto_responders.report(auto_responder.auto_responder_id)[0]
+        self.assertEquals(res.auto_responder_part_id, auto_responder.auto_responder_id)
         self.assertTrue(res.delivered is not None)
         self.assertTrue(res.clicked is not None)
         self.assertTrue(res.opened is not None)
@@ -92,16 +92,16 @@ class AutoRespondersTest(ExpressPigeonTest):
         self.assertTrue(res.bounced is not None)
 
     def test_bounced(self):
-        auto_responders = self.api.auto_responders.find_all()
-        res = self.api.auto_responders.bounced(auto_responders[0][1])
+        auto_responder = self.api.auto_responders.find_all()[0]
+        res = self.api.auto_responders.bounced(auto_responder.auto_responder_id)
         self.assertEquals(len(res), 0)
 
     def test_spam(self):
-        auto_responders = self.api.auto_responders.find_all()
-        res = self.api.auto_responders.spam(auto_responders[0][1])
+        auto_responder = self.api.auto_responders.find_all()[0]
+        res = self.api.auto_responders.spam(auto_responder.auto_responder_id)
         self.assertEquals(len(res), 0)
 
     def test_unsubscribed(self):
-        auto_responders = self.api.auto_responders.find_all()
-        res = self.api.auto_responders.unsubscribed(auto_responders[0][1])
+        auto_responder = self.api.auto_responders.find_all()[0]
+        res = self.api.auto_responders.unsubscribed(auto_responder.auto_responder_id)
         self.assertEquals(len(res), 0)
