@@ -56,37 +56,48 @@ class AutoResponders(object):
 
         return self.ep.get("{0}/{1}".format(self.endpoint, autoresponder_id))
 
-    def bounced(self, autoresponder_id):
-        """ Returns a list of bounced contacts
+    def bounced(self, autoresponder_id, auto_responder_part_id):
+        """ Returns a list of object(s) with email and id of bounced contacts
+        associated with given autoresponder part.
 
         :param autoresponder_id: auto responder id the bounced contacts are found for
         :type autoresponder_id: long
 
-        :returns: list of contacts ids
+        :param auto_responder_part_id: autoresponder part id the bounced contacts are found for
+        :type auto_responder_part_id: long
+
+        :returns: list of of object(s) with email and id
         :rtype: list
         """
-        return self.ep.get("{0}/{1}/bounced".format(self.endpoint, autoresponder_id))
+        return self.ep.get("{0}/{1}/{2}/bounced".format(self.endpoint, autoresponder_id, auto_responder_part_id))
 
-    def unsubscribed(self, autoresponder_id):
-        """ Returns a list of unsubscribed contacts
+    def unsubscribed(self, autoresponder_id, auto_responder_part_id):
+        """ Returns an array of object(s) with email and id of unsubscribed contacts
+        associate with this autoresponder part.
 
         :param autoresponder_id: auto responder id the unsubscribed contacts are found for
         :type autoresponder_id: long
 
+        :param auto_responder_part_id: autoresponder part id the bounced contacts are found for
+        :type auto_responder_part_id: long
+
         :returns: list of contacts ids
         :rtype: list
         """
 
-        return self.ep.get("{0}/{1}/unsubscribed".format(self.endpoint, autoresponder_id))
+        return self.ep.get("{0}/{1}/{2}/unsubscribed".format(self.endpoint, autoresponder_id, auto_responder_part_id))
 
-    def spam(self, autoresponder_id):
-        """ Returns a list of spam contacts
+    def spam(self, autoresponder_id, auto_responder_part_id):
+        """ Returns an array of object(s) with email and id of spam contacts associated with this autoresponder part.
 
         :param autoresponder_id: auto responder id the spam contacts are found for
         :type autoresponder_id: long
 
+        :param auto_responder_part_id: autoresponder part id the bounced contacts are found for
+        :type auto_responder_part_id: long
+
         :returns: list of contacts ids
         :rtype: list
         """
 
-        return self.ep.get("{0}/{1}/spam".format(self.endpoint, autoresponder_id))
+        return self.ep.get("{0}/{1}/{2}/spam".format(self.endpoint, autoresponder_id, auto_responder_part_id))

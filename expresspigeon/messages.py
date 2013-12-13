@@ -56,7 +56,7 @@ class Messages(object):
         return self.ep.post(self.endpoint, params={'template_id': template_id, 'to': to,
                                                    'reply_to': reply_to, 'from': from_name,
                                                    'subject': subject,
-                                                   'merger_fields': merge_fields,
+                                                   'merge_fields': merge_fields,
                                                    'view_online': view_online,
                                                    'click_tracking': click_tracking})
 

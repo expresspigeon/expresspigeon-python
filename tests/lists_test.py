@@ -1,5 +1,6 @@
 import os
 from random import randint
+from time import sleep
 import unittest
 import datetime
 import pytz
@@ -56,12 +57,18 @@ class ListsTest(ExpressPigeonTest):
         res = self.api.lists.upload(existing_list.list.id, self.file_to_upload)
         self.assertEqual(res.status, "success")
         self.assertEqual(res.code, 200)
+        self.assertEquals(res.message, "file uploaded successfully")
         self.assertTrue(res.upload_id is not None)
 
+        sleep(5)
+
         res = self.api.lists.upload_status(res.upload_id)
-        self.assertEqual(res.message, "upload complete")
-        self.assertEqual(res.status, "complete")
+        self.assertEqual(res.message, "file upload completed")
+        self.assertEqual(res.status, "success")
+        self.assertEqual(res.code, 200)
         report = res.report
+        self.assertTrue(report.completed)
+        self.assertFalse(report.failed)
         self.assertEqual(report.suppressed, 0)
         self.assertEqual(report.skipped, 0)
         self.assertEqual(report.list_name, list_name)

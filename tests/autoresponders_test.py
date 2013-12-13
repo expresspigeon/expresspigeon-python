@@ -93,15 +93,21 @@ class AutoRespondersTest(ExpressPigeonTest):
 
     def test_bounced(self):
         auto_responder = self.api.auto_responders.find_all()[0]
-        res = self.api.auto_responders.bounced(auto_responder.auto_responder_id)
+        auto_responder_parts = auto_responder.auto_responder_parts[0]
+        res = self.api.auto_responders.bounced(auto_responder.auto_responder_id,
+                                               auto_responder_parts.auto_responder_part_id)
         self.assertEquals(len(res), 0)
 
     def test_spam(self):
         auto_responder = self.api.auto_responders.find_all()[0]
-        res = self.api.auto_responders.spam(auto_responder.auto_responder_id)
+        auto_responder_parts = auto_responder.auto_responder_parts[0]
+        res = self.api.auto_responders.spam(auto_responder.auto_responder_id,
+                                            auto_responder_parts.auto_responder_part_id)
         self.assertEquals(len(res), 0)
 
     def test_unsubscribed(self):
         auto_responder = self.api.auto_responders.find_all()[0]
-        res = self.api.auto_responders.unsubscribed(auto_responder.auto_responder_id)
+        auto_responder_parts = auto_responder.auto_responder_parts[0]
+        res = self.api.auto_responders.unsubscribed(auto_responder.auto_responder_id,
+                                                    auto_responder_parts.auto_responder_part_id)
         self.assertEquals(len(res), 0)
