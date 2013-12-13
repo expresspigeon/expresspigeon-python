@@ -29,10 +29,20 @@ class MessagesTest(ExpressPigeonTest):
         self.assertEqual(res.status, "error")
         self.assertEqual(res.message, "template=-1 not found")
 
-    def test_sending_message_and_report(self):
+    def test_sending_message_without_required_merge_fields(self):
         message_response = self.api.messages.send_message(template_id=self.template_id,
                                                           to=os.environ['EXPRESSPIGEON_API_USER'],
                                                           reply_to="a@a.a", from_name="me", subject="Hi")
+        self.assertEqual(message_response.code, 400)
+        self.assertEqual(message_response.status, "error")
+        self.assertEqual(message_response.message, "missing value for:'first_name'")
+
+
+    def test_sending_message_and_report(self):
+        message_response = self.api.messages.send_message(template_id=self.template_id,
+                                                          to=os.environ['EXPRESSPIGEON_API_USER'],
+                                                          reply_to="a@a.a", from_name="me", subject="Hi",
+                                                          merge_fields={"first_name": "Gleb"})
         self.assertEqual(message_response.code, 200)
         self.assertEqual(message_response.status, "success")
         self.assertEqual(message_response.message, "email queued")
@@ -83,7 +93,8 @@ class MessagesTest(ExpressPigeonTest):
     def test_sending_multiple_messages_and_get_reports(self):
         message_response = self.api.messages.send_message(template_id=self.template_id,
                                                           to=os.environ['EXPRESSPIGEON_API_USER'],
-                                                          reply_to="a@a.a", from_name="me", subject="Hi")
+                                                          reply_to="a@a.a", from_name="me", subject="Hi",
+                                                          merge_fields={"first_name": "Gleb"})
         self.assertEqual(message_response.code, 200)
         self.assertEqual(message_response.status, "success")
         self.assertEqual(message_response.message, "email queued")
@@ -91,7 +102,8 @@ class MessagesTest(ExpressPigeonTest):
 
         message_response_2 = self.api.messages.send_message(template_id=self.template_id,
                                                             to=os.environ['EXPRESSPIGEON_API_USER'],
-                                                            reply_to="a@a.a", from_name="me", subject="Hi 2")
+                                                            reply_to="a@a.a", from_name="me", subject="Hi 2",
+                                                            merge_fields={"first_name": "Gleb"})
         self.assertEqual(message_response_2.code, 200)
         self.assertEqual(message_response_2.status, "success")
         self.assertEqual(message_response_2.message, "email queued")
@@ -112,7 +124,8 @@ class MessagesTest(ExpressPigeonTest):
     def test_sending_multiple_messages_and_get_reports_for_today(self):
         message_response = self.api.messages.send_message(template_id=self.template_id,
                                                           to=os.environ['EXPRESSPIGEON_API_USER'],
-                                                          reply_to="a@a.a", from_name="me", subject="Hi")
+                                                          reply_to="a@a.a", from_name="me", subject="Hi",
+                                                          merge_fields={"first_name": "Gleb"})
         self.assertEqual(message_response.code, 200)
         self.assertEqual(message_response.status, "success")
         self.assertEqual(message_response.message, "email queued")
@@ -120,7 +133,8 @@ class MessagesTest(ExpressPigeonTest):
 
         message_response_2 = self.api.messages.send_message(template_id=self.template_id,
                                                             to=os.environ['EXPRESSPIGEON_API_USER'],
-                                                            reply_to="a@a.a", from_name="me", subject="Hi 2")
+                                                            reply_to="a@a.a", from_name="me", subject="Hi 2",
+                                                            merge_fields={"first_name": "Gleb"})
         self.assertEqual(message_response_2.code, 200)
         self.assertEqual(message_response_2.status, "success")
         self.assertEqual(message_response_2.message, "email queued")
