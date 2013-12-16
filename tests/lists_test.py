@@ -8,37 +8,26 @@ from tests import ExpressPigeonTest
 
 
 class ListsTest(ExpressPigeonTest):
-    def test_create_new_list(self):
-        res = self.api.lists.create(name="Active customers", from_name="Bob", reply_to="bob@acmetools.com")
+    def test_create_and_delete_new_list(self):
+        contact_list = self.api.lists.create(name="Active customers", from_name="Bob", reply_to="bob@acmetools.com")
+        self.assertEqual(contact_list.status, "success")
+        self.assertEqual(contact_list.code, 200)
+        self.assertEqual(contact_list.message, "list={0} created/updated successfully".format(contact_list.list.id))
+        self.assertEqual(contact_list.list.name, "Active customers")
+        self.assertEqual(contact_list.list.from_name, "Bob")
+        self.assertEqual(contact_list.list.reply_to, "bob@acmetools.com")
+        self.assertEqual(contact_list.list.contact_count, 0)
+        self.assertEqual(contact_list.list.zip, '220000')
+        self.assertEqual(contact_list.list.state, "AL")
+        self.assertEqual(contact_list.list.address1, "Coolman 11")
+        self.assertEqual(contact_list.list.city, "Minsk")
+        self.assertEqual(contact_list.list.country, "Belarus")
+        self.assertEqual(contact_list.list.organization, "ExpressPigeon")
+
+        res = self.api.lists.delete(contact_list.list.id)
         self.assertEqual(res.status, "success")
         self.assertEqual(res.code, 200)
-        self.assertEqual(res.message, "list={0} created/updated successfully".format(res.list.id))
-        self.assertEqual(res.list.name, "Active customers")
-        self.assertEqual(res.list.from_name, "Bob")
-        self.assertEqual(res.list.reply_to, "bob@acmetools.com")
-        self.assertEqual(res.list.contact_count, 0)
-        self.assertEqual(res.list.zip, '220000')
-        self.assertEqual(res.list.state, "AL")
-        self.assertEqual(res.list.address1, "Coolman 11")
-        self.assertEqual(res.list.city, "Minsk")
-        self.assertEqual(res.list.country, "Belarus")
-        self.assertEqual(res.list.organization, "ExpressPigeon")
-
-    def test_delete_all_lists(self):
-        lists = self.api.lists.find_all()
-        scheduled_and_suppressed = 1
-        for contact_list in lists:
-            if contact_list.name != 'Disabled list':
-                res = self.api.lists.delete(contact_list.id)
-                if (res.message == "could not delete list={0}, it has dependent subscriptions "
-                                   "and/or scheduled campaigns".format(contact_list.id)):
-                    scheduled_and_suppressed += 1
-                    continue
-
-                self.assertEqual(res.status, "success")
-                self.assertEqual(res.code, 200)
-                self.assertEqual(res.message, "list=%d deleted successfully" % contact_list.id)
-        self.assertEqual(len(self.api.lists.find_all()), scheduled_and_suppressed)
+        self.assertEqual(res.message, "list=%d deleted successfully" % contact_list.list.id)
 
     def test_update_existing_list(self):
         existing_list = self.api.lists.create("Update", "Bob", "bob@acmetools.com")
@@ -135,7 +124,7 @@ class ListsTest(ExpressPigeonTest):
 
     def test_export_csv(self):
         list_response = self.api.lists.create("My List", "a@a.a", "a@a.a")
-        self.api.contacts.upsert(list_response.list.id, {"email": "mary@e.e"})
+        self.api.contacts.upsert(list_response.list.id, {"email": "mary@a.a"})
 
         res = self.api.lists.csv(list_response.list.id).split("\n")
         self.assertEquals(len(res), 2)
@@ -146,10 +135,11 @@ class ListsTest(ExpressPigeonTest):
                   '"custom_field_3", "custom_field_4", "custom_field_5", "custom_field_6", "custom_field_7", ' \
                   '"custom_field_8", "custom_field_9"'
         self.assertEquals(res[0], headers)
-        self.assertEquals(res[1], '"mary@e.e",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,')
+        self.assertEquals(res[1], '"mary@a.a",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,')
 
         self.api.lists.delete(list_response.list.id)
-        self.api.contacts.delete("mary@e.e")
+        self.api.contacts.delete("mary@a.a")
+
 
 if __name__ == '__main__':
     unittest.main()

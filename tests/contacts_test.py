@@ -28,12 +28,12 @@ class ContactsTest(ExpressPigeonTest):
         self.assertEqual(res.message, "You cannot create more than 20 custom fields. Use one of the 'custom_fields'.")
 
     def test_create_non_existent_contact_without_list_id(self):
-        res = self.api.contacts.upsert("", {"email": "mary@e.e",
+        res = self.api.contacts.upsert("", {"email": "ee@e.e",
                                             "first_name": "Marylin",
                                             "last_name": "Monroe"})
         self.assertEqual(res.code, 404)
         self.assertEqual(res.status, "error")
-        self.assertEqual(res.message, "contact=mary@e.e not found")
+        self.assertEqual(res.message, "contact=ee@e.e not found")
 
     def test_create_with_suppressed_contact(self):
         res = self.api.contacts.upsert(-1, {"email": "suppressed@e.e"})
@@ -42,7 +42,7 @@ class ContactsTest(ExpressPigeonTest):
         self.assertEqual(res.message, "contact=suppressed@e.e is in suppress list")
 
     def test_create_with_non_existent_list(self):
-        res = self.api.contacts.upsert(-1, {"email": "mary@e.e"})
+        res = self.api.contacts.upsert(-1, {"email": "e@e.e"})
         self.assertEqual(res.code, 404)
         self.assertEqual(res.status, "error")
         self.assertEqual(res.message, "list=-1 not found")

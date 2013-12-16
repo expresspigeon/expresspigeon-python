@@ -179,6 +179,10 @@ class IntegrationTest(ExpressPigeonTest):
         auto_responder = list(filter(lambda auto_responder: auto_responder.name == 'Test',
                                      self.api.auto_responders.find_all()))[0]
         try:
+            self.assertEqual(self.api.lists.delete(list_resp.list.id).message,
+                             "could not delete list={0}, it has dependent subscriptions and/or scheduled campaigns"
+                                 .format(list_resp.list.id))
+
             old_report = self.api.auto_responders.report(auto_responder.auto_responder_id)[0]
 
             auto_responder_res = self.api.auto_responders.start(auto_responder.auto_responder_id,
