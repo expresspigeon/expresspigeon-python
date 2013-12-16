@@ -8,7 +8,7 @@ class AutoRespondersTest(ExpressPigeonTest):
         self.assertEquals(len(auto_responders), 3)
 
     def test_auto_responder_start(self):
-        auto_responder = list(filter(lambda auto_responder: auto_responder[2] == 'Test',
+        auto_responder = list(filter(lambda auto_responder: auto_responder.name == 'Test',
                                      self.api.auto_responders.find_all()))[0]
 
         list_resp = self.api.lists.create("My list", "John", os.environ['EXPRESSPIGEON_API_USER'])
