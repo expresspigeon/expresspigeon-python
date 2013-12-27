@@ -69,7 +69,7 @@ class Messages(object):
 
         :returns: EpResponse with a report, e.g.
         {
-           "id": "10000000-0000-0000-0000-000000000001",
+           "id": 1,
            "email": "john@example.net",
            "in_transit": false,
            "delivered": true,
@@ -88,15 +88,12 @@ class Messages(object):
 
         return self.ep.get("{0}/{1}".format(self.endpoint, message_id))
 
-    def reports(self, page, page_size, start_date=None, end_date=None):
-        """ Returns a report for any number of transactional emails sent with this API.
+    def reports(self, start_date=None, end_date=None, from_id=None):
+        """ Returns a report for at most 1000 of transactional emails sent with this API.
         The start_date and end_date parameters should be provided together.
 
-        :param page: Page number to be selected indexed at 0.
+        :param from_id: Id from where to get the next batch, e.g. the last id from the report.
         :type page: int
-
-        :param page_size: Desired size of page to be selected (max number is 100).
-        :type page_size: int
 
         :param start_date: Start of the reporting period (UTC, example: 2013-03-16T11:22:23.210+0000)
         :type start_date: date
@@ -106,7 +103,7 @@ class Messages(object):
 
         :returns: EpResponse with array of reports, e.g.
         [{
-           "id": "10000000-0000-0000-0000-000000000001",
+           "id": 1,
            "email": "john@example.net",
            "in_transit": false,
            "delivered": true,
@@ -120,13 +117,14 @@ class Messages(object):
            "created_at": "2013-03-15T11:20:21.770+0000",
            "updated_at": "2013-03-16T11:22:23.210+0000"
           },{
-           "id": "20000000-0000-0000-0000-000000000002",
+           "id": 2,
            "email": "bob@example.net",
            "in_transit": false,
            "delivered": true,
            "bounced": false,
            "opened": false,
            "clicked": false,
+           "urls": [],
            "spam": false,
            "created_at": "2013-04-15T11:20:21.770+0000",
            "updated_at": "2013-04-16T11:22:23.210+0000"
@@ -134,8 +132,13 @@ class Messages(object):
         :rtype: EpResponse
         """
 
-        query = "{0}?page={1}&page_size={2}"
+        params = []
+        if from_id is not None:
+            params.append("from_id=" + from_id)
         if start_date is not None and end_date is not None:
-            query += "&start_date={0}&end_date={1}".format(start_date, end_date)
-
-        return self.ep.get(query.format(self.endpoint, page, page_size))
+            params.append("start_date=" + start_date)
+            params.append("end_date=" + end_date)
+        query = self.endpoint
+        if params:
+            query += "?" + "&".join(params)
+        return self.ep.get(query)

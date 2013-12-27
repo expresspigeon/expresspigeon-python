@@ -29,15 +29,6 @@ class MessagesTest(ExpressPigeonTest):
         self.assertEqual(res.status, "error")
         self.assertEqual(res.message, "template=-1 not found")
 
-    def test_sending_message_without_required_merge_fields(self):
-        message_response = self.api.messages.send_message(template_id=self.template_id,
-                                                          to=os.environ['EXPRESSPIGEON_API_USER'],
-                                                          reply_to="a@a.a", from_name="me", subject="Hi")
-        self.assertEqual(message_response.code, 400)
-        self.assertEqual(message_response.status, "error")
-        self.assertEqual(message_response.message, "missing value for:'first_name'")
-
-
     def test_sending_message_and_report(self):
         message_response = self.api.messages.send_message(template_id=self.template_id,
                                                           to=os.environ['EXPRESSPIGEON_API_USER'],
@@ -53,39 +44,20 @@ class MessagesTest(ExpressPigeonTest):
         self.assertEquals(report.email, os.environ['EXPRESSPIGEON_API_USER'])
         self.assertTrue(report.in_transit is not None)
 
-
-    def test_reports_without_params(self):
-        res = self.api.messages.reports("", "")
-        self.assertEquals(res.code, 400)
-        self.assertEquals(res.status, "error")
-        self.assertEquals(res.message, "mandatory parameters: 'page_size' and 'page'")
-
-    def test_reports_with_page_negative_page(self):
-        res = self.api.messages.reports(-1, 1)
-        self.assertEquals(res.code, 400)
-        self.assertEquals(res.status, "error")
-        self.assertEquals(res.message, "'page' parameter should be greater than or equal to zero")
-
-    def test_reports_with_big_page_size(self):
-        res = self.api.messages.reports(1, 1000)
-        self.assertEquals(res.code, 400)
-        self.assertEquals(res.status, "error")
-        self.assertEquals(res.message, "page size greater than 100")
-
     def test_reports_with_bad_dates(self):
-        res = self.api.messages.reports(1, 1, "abc", "")
+        res = self.api.messages.reports("abc", "")
         self.assertEquals(res.code, 400)
         self.assertEquals(res.status, "error")
         self.assertEquals(res.message, "invalid 'start_date' or 'end_date'")
 
     def test_reports_with_start_date_only(self):
-        res = self.api.messages.reports(1, 1, "2013-03-16T11:22:23.210+0000", "")
+        res = self.api.messages.reports("2013-03-16T11:22:23.210+0000", "")
         self.assertEquals(res.code, 400)
         self.assertEquals(res.status, "error")
         self.assertEquals(res.message, "'start_date' and 'end_date' should be provided together")
 
     def test_reports_with_end_date_only(self):
-        res = self.api.messages.reports(1, 1, "", "2013-03-16T11:22:23.210+0000")
+        res = self.api.messages.reports("", "2013-03-16T11:22:23.210+0000")
         self.assertEquals(res.code, 400)
         self.assertEquals(res.status, "error")
         self.assertEquals(res.message, "'start_date' and 'end_date' should be provided together")
@@ -156,15 +128,9 @@ class MessagesTest(ExpressPigeonTest):
         self.assertEquals(report2.email, os.environ['EXPRESSPIGEON_API_USER'])
         self.assertTrue(report2.in_transit is not None)
 
-    def __get_report_by_id__(self, message_id, page=0, start_date=None, end_date=None):
-
-        reports = self.api.messages.reports(page, 100) if start_date is None and end_date is None else \
-            self.api.messages.reports(page, 100, start_date, end_date)
-        if len(reports) == 0:
-            return None
-
+    def __get_report_by_id__(self, message_id, start_date=None, end_date=None):
+        reports = self.api.messages.reports() if start_date is None and end_date is None else \
+            self.api.messages.reports(start_date, end_date)
         report = [r for r in reports if r.id == message_id]
-        if len(report) == 1:
-            return report[0]
-        elif len(report) == 0:
-            return self.__get_report_by_id__(message_id, page + 1)
+        self.assertEquals(len(report), 1)
+        return report[0]
