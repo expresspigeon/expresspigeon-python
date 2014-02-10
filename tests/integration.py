@@ -90,9 +90,14 @@ class IntegrationTest(ExpressPigeonTest):
     def test_transactional_email_sent(self):
         number = randint(0, 9999)
         subject = "Hi, #{0}".format(number)
+        video_html = "<a href='https://www.youtube.com/watch?v=7AtJ7gGBfnE'>" \
+                     "<img src='https://content.expresspigeon.com/image_gallery/uploaded/182/4278/Yv-lGX2FS1g.jpg'></a>"
+
         message_response = self.api.messages.send_message(template_id=self.template_id,
                                                           to=os.environ['EXPRESSPIGEON_API_USER'],
-                                                          reply_to="a@a.a", from_name="me", subject=subject)
+                                                          reply_to="a@a.a", from_name="me", subject=subject,
+                                                          view_online=True, merge_fields={"first_name": "Gleb",
+                                                                                          "html_insert": video_html})
         self.assertEqual(message_response.code, 200)
         self.assertEqual(message_response.status, "success")
         self.assertEqual(message_response.message, "email queued")
@@ -101,6 +106,10 @@ class IntegrationTest(ExpressPigeonTest):
         email = self.wait_until(self.gmail.get_by_subject, 300, subject=subject)
         self.assertTrue(email is not None)
         self.assertEquals(len(email), 1)
+
+        self.assertTrue("view online" in email[0]['body'])
+        self.assertTrue("Gleb" in email[0]['body'])
+        self.assertTrue("<a href=3D'https://www.youtube.com/watch?v=3D7AtJ7gGBfnE'>" in email[0]['body'])
 
         self.__emulate_browser_open_and_click__(email[0]['body'])
         self.__emulate_browser_open_and_click__(email[0]['body'])
@@ -181,7 +190,7 @@ class IntegrationTest(ExpressPigeonTest):
         try:
             self.assertEqual(self.api.lists.delete(list_resp.list.id).message,
                              "could not delete list={0}, it has dependent subscriptions and/or scheduled campaigns"
-                                 .format(list_resp.list.id))
+                             .format(list_resp.list.id))
 
             old_report = self.api.auto_responders.report(auto_responder.auto_responder_id)[0]
 
