@@ -79,7 +79,7 @@ class ListsTest(ExpressPigeonTest):
         res = self.api.lists.delete(130)
         self.assertEqual(res.code, 400)
         self.assertEqual(res.status, "error")
-        self.assertEqual(res.message, "could not delete disabled list=130")
+        self.assertEqual(res.message, "could not delete list=130, list is disabled")
 
     def test_upload_without_id(self):
         res = self.api.lists.upload("", self.file_to_upload)
@@ -119,7 +119,7 @@ class ListsTest(ExpressPigeonTest):
         self.assertEqual(res.code, 400)
         self.assertEqual(res.status, "error")
         self.assertEqual(res.message,
-                         "could not delete list={0}, it has dependent subscriptions and/or scheduled campaigns".format(
+                         "could not delete list={0}, list has scheduled campaigns".format(
                              list_resp.list.id))
 
     def test_export_csv(self):

@@ -7,7 +7,7 @@ class AutoRespondersTest(ExpressPigeonTest):
         auto_responders = self.api.auto_responders.find_all()
         self.assertEquals(len(auto_responders), 3)
 
-    def test_auto_responder_start(self):
+    def test_auto_responder_start_stop(self):
         auto_responder = list(filter(lambda auto_responder: auto_responder.name == 'Test',
                                      self.api.auto_responders.find_all()))[0]
 
@@ -18,6 +18,13 @@ class AutoRespondersTest(ExpressPigeonTest):
         self.assertEquals(res.code, 200)
         self.assertEquals(res.status, "success")
         self.assertEquals(res.message, "auto_responder={0} started successfully for contact={1}".format(
+            auto_responder.auto_responder_id,
+            os.environ['EXPRESSPIGEON_API_USER']))
+
+        res = self.api.auto_responders.stop(auto_responder.auto_responder_id, os.environ['EXPRESSPIGEON_API_USER'])
+        self.assertEquals(res.code, 200)
+        self.assertEquals(res.status, "success")
+        self.assertEquals(res.message, "auto_responder={0} stopped successfully for contact={1}".format(
             auto_responder.auto_responder_id,
             os.environ['EXPRESSPIGEON_API_USER']))
 

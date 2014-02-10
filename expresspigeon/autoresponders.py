@@ -21,6 +21,20 @@ class AutoResponders(object):
         """
         return self.ep.post("{0}/{1}/start".format(self.endpoint, autoresponder_id), params={"email": email})
 
+    def stop(self, autoresponder_id, email):
+        """ This feature allow developers to stop auto responder for a contact.
+
+        :param autoresponder_id: auto responder id to be stopped for a contact
+        :type autoresponder_id: int
+
+        :param email: contact email
+        :type email: str
+
+        :returns: EpResponse with message about autoresponder stop
+        :rtype: EpResponse
+        """
+        return self.ep.post("{0}/{1}/stop".format(self.endpoint, autoresponder_id), params={"email": email})
+
     def find_all(self):
         """ Returns all auto responders.
 
