@@ -1,4 +1,3 @@
-
 class Campaigns(object):
     """Campaigns endpoint
     """
@@ -8,13 +7,43 @@ class Campaigns(object):
     def __init__(self, ep):
         self.ep = ep
 
-    def get_all(self):
-        """ Return an array of all campaigns IDs
+    def get_all(self, start_date=None, end_date=None, from_id=None):
+        """ Returns up to 1000 campaigns starting with smallest campaign id in date range.
 
-        :returns: list of campaigns ids
-        :rtype: list
+        :param from_id: smallest campaign id
+        :type from_id: str
+
+        :param start_date: Start of the reporting period (UTC, for example 2013-03-16T11:22:23.210+0000)
+        :type start_date: str
+
+        :param end_date: End of the reporting period (UTC, for example 2013-03-16T11:22:23.210+0000)
+        :type end_date: str
+
+        :returns: list of campaigns EPResponse objects, e.g.
+        [{
+            "total":1,
+            "id":1,
+            "send_time":"2014-01-10T10:24:22.000+0000",
+            "template_name":"1",
+            "reply_to":"john@example.net",
+            "from_name":"John",
+            "subject":"Hi",
+            "name":"My Campaign",
+            "list_id":1
+        }]
+        :rtype: list of EpResponse objects
         """
-        return self.ep.get(self.endpoint)
+
+        params = []
+        if from_id is not None:
+            params.append("from_id=" + str(from_id))
+        if start_date is not None and end_date is not None:
+            params.append("start_date=" + start_date)
+            params.append("end_date=" + end_date)
+        query = self.endpoint
+        if params:
+            query += "?" + "&".join(params)
+        return self.ep.get(query)
 
     def send(self, list_id, template_id, name, from_name, reply_to, subject, google_analytics):
         """ Creates a campaign. Invocation of this API will trigger sending a new campaign.

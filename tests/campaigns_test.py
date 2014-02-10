@@ -1,5 +1,6 @@
 import os
 import unittest
+from datetime import datetime
 from expresspigeon import ExpressPigeon
 from tests import ExpressPigeonTest
 
@@ -18,9 +19,33 @@ class CampaignsTest(ExpressPigeonTest):
         self.assertEqual(res.message, "required Content-type: application/json")
 
     def test_get_all_campaigns(self):
+        # we know there are 2 campaigns at least
         res = self.api.campaigns.get_all()
         self.assertTrue(res is not None)
         self.assertTrue(isinstance(res, list))
+        self.assertTrue(len(res) > 1)
+
+        json = ('from_name', 'name', 'template_name', 'list_id', 'send_time', 'reply_to', 'total', 'id', 'subject')
+        self.assertTrue(res[0]._fields == json)
+
+        start_date = datetime.strptime(res[0].send_time, "%Y-%m-%dT%H:%M:%S.%f+0000")
+        end_date = datetime(start_date.year + int(start_date.month / 12), int((start_date.month % 12) + 1), 1)
+
+        from_id = res[0].id
+
+        dates_res = self.api.campaigns.get_all(
+            start_date.strftime("%Y-%m-%dT%H:%M:%S.%f+0000"),
+            end_date.strftime("%Y-%m-%dT%H:%M:%S.%f+0000"),
+            from_id)
+        self.assertTrue(dates_res is not None)
+        self.assertTrue(isinstance(dates_res, list))
+        self.assertTrue(len(dates_res) > 0)
+
+        second_campaign = [c for c in dates_res if c.id == res[1].id]
+        self.assertTrue(second_campaign[0] == res[1])
+
+        first_campaign = [c for c in dates_res if c.id == res[0].id]
+        self.assertFalse(len(first_campaign))
 
     def test_send_without_params(self):
         res = self.api.campaigns.send(list_id=-1, template_id=-1, name="", from_name="", reply_to="", subject="",

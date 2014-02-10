@@ -93,13 +93,13 @@ class Messages(object):
         The start_date and end_date parameters should be provided together.
 
         :param from_id: Id from where to get the next batch, e.g. the last id from the report.
-        :type page: int
+        :type from_id: str
 
-        :param start_date: Start of the reporting period (UTC, example: 2013-03-16T11:22:23.210+0000)
-        :type start_date: date
+        :param start_date: Start of the reporting period (UTC, example 2013-03-16T11:22:23.210+0000)
+        :type start_date: str
 
-        :param end_date: End of the reporting period (UTC, example: 2013-03-16T11:22:23.210+0000)
-        :type end_date: date
+        :param end_date: End of the reporting period (UTC, example 2013-03-16T11:22:23.210+0000)
+        :type end_date: str
 
         :returns: EpResponse with array of reports, e.g.
         [{
