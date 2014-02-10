@@ -26,7 +26,7 @@ class CampaignsTest(ExpressPigeonTest):
         self.assertTrue(len(res) > 1)
 
         json = ('from_name', 'name', 'template_name', 'list_id', 'send_time', 'reply_to', 'total', 'id', 'subject')
-        self.assertTrue(res[0]._fields == json)
+        self.assertTrue(sorted(res[0]._fields) == sorted(json))
 
         start_date = datetime.strptime(res[0].send_time, "%Y-%m-%dT%H:%M:%S.%f+0000")
         end_date = datetime(start_date.year + int(start_date.month / 12), int((start_date.month % 12) + 1), 1)
