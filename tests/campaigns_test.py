@@ -25,7 +25,7 @@ class CampaignsTest(ExpressPigeonTest):
         self.assertTrue(isinstance(res, list))
         self.assertTrue(len(res) > 1)
 
-        json = ('from_name', 'name', 'template_name', 'list_id', 'send_time', 'reply_to', 'total', 'id', 'subject')
+        json = ('from_name', 'name', 'template_id', 'template_name', 'list_id', 'send_time', 'reply_to', 'total', 'id', 'subject')
         self.assertTrue(sorted(res[0]._fields) == sorted(json))
 
         start_date = datetime.strptime(res[0].send_time, "%Y-%m-%dT%H:%M:%S.%f+0000")

@@ -8,11 +8,12 @@ class AutoRespondersTest(ExpressPigeonTest):
         self.assertEquals(len(auto_responders), 3)
 
     def test_auto_responder_start_stop(self):
-        auto_responder = list(filter(lambda auto_responder: auto_responder.name == 'Test',
+        auto_responder = list(filter(lambda ar: ar.name == 'Test',
                                      self.api.auto_responders.find_all()))[0]
 
         list_resp = self.api.lists.create("My list", "John", os.environ['EXPRESSPIGEON_API_USER'])
-        self.api.contacts.upsert(list_resp.list.id, {"email": os.environ['EXPRESSPIGEON_API_USER']})
+        contact_resp = self.api.contacts.upsert(list_resp.list.id, [{"email": os.environ['EXPRESSPIGEON_API_USER']}])
+        self.assertEqual(contact_resp.code, 200)
 
         res = self.api.auto_responders.start(auto_responder.auto_responder_id, os.environ['EXPRESSPIGEON_API_USER'])
         self.assertEquals(res.code, 200)
@@ -38,7 +39,7 @@ class AutoRespondersTest(ExpressPigeonTest):
         self.assertEquals(res.message, "auto_responder=-1 not found")
 
     def test_start_disabled_auto_responder(self):
-        auto_responder = list(filter(lambda auto_responder: auto_responder.name == 'Disabled Autoresponder',
+        auto_responder = list(filter(lambda ar: ar.name == 'Disabled Autoresponder',
                                      self.api.auto_responders.find_all()))[0]
 
         res = self.api.auto_responders.start(auto_responder.auto_responder_id, "")
@@ -47,7 +48,7 @@ class AutoRespondersTest(ExpressPigeonTest):
         self.assertEquals(res.message, "auto_responder={0} disabled".format(auto_responder.auto_responder_id))
 
     def test_start_without_email(self):
-        auto_responder = list(filter(lambda auto_responder: auto_responder.name == 'Test',
+        auto_responder = list(filter(lambda ar: ar.name == 'Test',
                                      self.api.auto_responders.find_all()))[0]
 
         res = self.api.auto_responders.start(auto_responder.auto_responder_id, "")
@@ -56,7 +57,7 @@ class AutoRespondersTest(ExpressPigeonTest):
         self.assertEquals(res.message, "'email' required")
 
     def test_start_with_non_existent_email(self):
-        auto_responder = list(filter(lambda auto_responder: auto_responder.name == 'Test',
+        auto_responder = list(filter(lambda ar: ar.name == 'Test',
                                      self.api.auto_responders.find_all()))[0]
 
         res = self.api.auto_responders.start(auto_responder.auto_responder_id, "non_existent_email@e.e")
@@ -65,20 +66,20 @@ class AutoRespondersTest(ExpressPigeonTest):
         self.assertEquals(res.message, "contact=non_existent_email@e.e not found")
 
     def test_start_without_newsletter(self):
-        auto_responder = list(filter(lambda auto_responder: auto_responder.name == 'No newsletter',
+        auto_responder = list(filter(lambda ar: ar.name == 'No newsletter',
                                      self.api.auto_responders.find_all()))[0]
 
         list_resp = self.api.lists.create("My list", "John", os.environ['EXPRESSPIGEON_API_USER'])
-        self.api.contacts.upsert(list_resp.list.id, {"email": os.environ['EXPRESSPIGEON_API_USER']})
+        self.api.contacts.upsert(list_resp.list.id, [{"email": os.environ['EXPRESSPIGEON_API_USER']}])
 
         res = self.api.auto_responders.start(auto_responder.auto_responder_id, os.environ['EXPRESSPIGEON_API_USER'])
         self.assertEquals(res.code, 400)
         self.assertEquals(res.status, "error")
-        self.assertEquals(res.message, "auto_responder={0} does not have any newsletters".format(auto_responder.auto_responder_id))
+        self.assertEquals(res.message,
+                          "auto_responder={0} does not have any newsletters".format(auto_responder.auto_responder_id))
 
         self.api.contacts.delete(os.environ['EXPRESSPIGEON_API_USER'])
         self.api.lists.delete(list_resp.list.id)
-
 
     def test_report_for_unknown_auto_responder(self):
         res = self.api.auto_responders.report(-1)

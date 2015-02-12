@@ -100,7 +100,7 @@ class ListsTest(ExpressPigeonTest):
 
     def test_enabled_list_removal(self):
         list_resp = self.api.lists.create("My list", "John", os.environ['EXPRESSPIGEON_API_USER'])
-        self.api.contacts.upsert(list_resp.list.id, {"email": os.environ['EXPRESSPIGEON_API_USER']})
+        self.api.contacts.upsert(list_resp.list.id, [{"email": os.environ['EXPRESSPIGEON_API_USER']}])
 
         now = datetime.datetime.now(pytz.UTC)
         schedule = self.format_date(now + datetime.timedelta(hours=1))
@@ -124,7 +124,10 @@ class ListsTest(ExpressPigeonTest):
 
     def test_export_csv(self):
         list_response = self.api.lists.create("My List", "a@a.a", "a@a.a")
-        self.api.contacts.upsert(list_response.list.id, {"email": "mary@a.a"})
+        self.assertEqual(list_response.code, 200)
+
+        contacts_response = self.api.contacts.upsert(list_response.list.id, [{"email": "mary@a.a"}])
+        self.assertEqual(contacts_response.code, 200)
 
         res = self.api.lists.csv(list_response.list.id).split("\n")
         self.assertEquals(len(res), 2)

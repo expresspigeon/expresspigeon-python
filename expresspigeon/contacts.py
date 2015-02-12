@@ -6,8 +6,8 @@ class Contacts(object):
     def __init__(self, ep):
         self.ep = ep
 
-    def upsert(self, list_id, contact):
-        """ JSON document represents a contact to be created or updated.
+    def upsert(self, list_id, contacts):
+        """ JSON document represents a list of contacts to be created or updated.
         The email field is required.
         When updating a contact, list_id is optional,
         since the contact is uniquely identified by email across all lists.
@@ -15,13 +15,13 @@ class Contacts(object):
         :param list_id: Contact list ID the contact will be added to
         :type list_id: long
 
-        :param contact: Dictionary describes new contact. The "email" field is required.
-        :type contact: dict
+        :param contacts: List of dictionaries describes new contacts. The "email" field is required.
+        :type contacts: list
 
         :returns: EpResponse with JSON representation of a contact
         :rtype: EpResponse
         """
-        return self.ep.post(self.endpoint, params={"list_id": list_id, "contact": contact})
+        return self.ep.post(self.endpoint, params={"list_id": list_id, "contacts": contacts})
 
     def find_by_email(self, email):
         """ Returns a single contact by email address.

@@ -40,6 +40,31 @@ class ExpressPigeonTest(unittest.TestCase):
     def format_date(self, date):
         return date.strftime('%Y-%m-%dT%H:%M:%S.') + date.strftime('%f')[:3] + date.strftime("%z")
 
+    def create_contact(self):
+        contact_list = self.api.lists.create(name="Marylin Monroe List", from_name="Marylin",
+                                             reply_to="marylin@acmetools.com")
+        self.assertEqual(contact_list.status, "success")
+        self.assertEqual(contact_list.code, 200)
+        self.assertEqual(contact_list.message, "list={0} created/updated successfully".format(contact_list.list.id))
+
+        contacts = self.api.contacts.upsert(list_id=contact_list.list.id, contacts=[
+            {
+                "email": "john@doe.net",
+                "first_name": "John",
+                "last_name": "Doe"
+            },
+            {
+                "email": "jane@doe.net",
+                "first_name": "Jane",
+                "last_name": "Doe"
+            }
+        ])
+
+        self.assertEqual(contacts.status, "success")
+        self.assertEqual(contacts.code, 200)
+        self.assertEqual(contacts.message, "contacts created/updated successfully")
+        self.assertEqual(contacts.contacts, ["john@doe.net", "jane@doe.net"])
+
 
 class Gmail(object):
     def __extract_body__(self, payload):

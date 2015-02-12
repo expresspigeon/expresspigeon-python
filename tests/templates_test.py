@@ -19,6 +19,6 @@ class TemplatesTest(ExpressPigeonTest):
 
     def test_template_copy_with_bad_template_id(self):
         res = self.api.templates.copy(-1, "My Name")
-        self.assertEquals(res.code, 400)
+        self.assertEquals(res.code, 404)
         self.assertEquals(res.status, "error")
         self.assertEquals(res.message, "template=-1 not found")
