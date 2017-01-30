@@ -2,3 +2,8 @@
 *.iml
 .DS_Store
 *.pyc
+/build/
+/dist/
+/ExpressPigeon.egg-info/
+/nb-configuration.xml
+/expresspigeon/ExpressPigeon.egg-info/

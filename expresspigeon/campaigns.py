@@ -137,7 +137,55 @@ class Campaigns(object):
         """
 
         return self.ep.get("{0}/{1}".format(self.endpoint, campaign_id))
+    
+    def delete(self, campaign_id):
+        """ Removes a campaign with a given id. Only scheduled campaigns can be deleted. Those that have already been sent cannot be deleted.
 
+        :param campaign_id: The id of a campaign to be removed.
+        :type campaign_id: long
+        """
+
+        return self.ep.delete("{0}/{1}".format(self.endpoint, campaign_id))
+    
+    def opened(self, campaign_id):
+        """ Returns an array of opened events from a campaign.
+
+        :param campaign_id: Campaign id the opened events are found for.
+        :type campaign_id: long
+
+        :returns: list of dicts, e.g. 
+        [{
+            "timestamp": "2013-09-20T11:29:57.000+0000",
+            "ip_address": "127.0.0.1",
+            "email": "bob@example.net",
+            "event_type": "opened",
+            "user_agent": "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)"
+        }]
+        :rtype: EpResponse
+        """
+
+        return self.ep.get("{0}/{1}/opened".format(self.endpoint, campaign_id))
+
+    def clicked(self, campaign_id):
+        """ Returns an array of clicked events from a campaign.
+
+        :param campaign_id: Campaign id the clicked events are found for.
+        :type campaign_id: long
+
+        :returns: list of dicts, e.g. 
+        [{
+            "timestamp": "2014-01-15T13:34:27.000+0000",
+            "ip_address": "127.0.0.1",
+            "email": "bob@example.net",
+            "event_type": "clicked",
+            "user_agent": "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36",
+            "url": "http://example.net"
+        }]
+        :rtype: EpResponse
+        """
+
+        return self.ep.get("{0}/{1}/clicked".format(self.endpoint, campaign_id))
+    
     def bounced(self, campaign_id):
         """ Returns bounced contacts
 

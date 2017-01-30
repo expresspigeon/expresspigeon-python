@@ -7,6 +7,7 @@ from expresspigeon.contacts import Contacts
 from expresspigeon.lists import Lists
 from expresspigeon.messages import Messages
 from expresspigeon.templates import Templates
+from expresspigeon.dictionaries import Dictionaries
 
 try:
     from urllib import request as url_lib
@@ -65,6 +66,7 @@ class ExpressPigeon(object):
         self.messages = Messages(self)
         self.templates = Templates(self)
         self.auto_responders = AutoResponders(self)
+        self.dictionaries = Dictionaries(self)
 
     def __getattr__(self, name):
         """
@@ -79,35 +81,35 @@ class ExpressPigeon(object):
     def __send_request__(self, endpoint, method, **kwargs):
         content_type = kwargs["content_type"] if "content_type" in kwargs else "application/json"
         body = kwargs["body"] if "body" in kwargs else json.dumps(kwargs["params"] if "params" in kwargs else {})
-
+        
         opener = url_lib.build_opener(url_lib.HTTPSHandler)
 
         req = self.Request(url=(self.ROOT if self.ROOT.endswith("/") else self.ROOT + "/") + endpoint,
                            method=method.upper(),
-                           headers={"X-auth-key": self.auth_key, "Content-type": content_type},
+                           headers={"X-auth-key": self.auth_key, "Content-type": content_type, "User-Agent": "Mozilla/5.0"},
                            data=body.encode("utf-8"))
 
         self.request_hook(req)
-
+        
         try:
-            return json.loads(opener.open(req).read().decode("utf-8"), "UTF-8",
+            return json.loads(opener.open(req).read().decode("utf-8"), encoding="UTF-8",
                               object_hook=lambda d: namedtuple('EpResponse', d.keys())(*d.values()))
         except url_lib.HTTPError as e:
-            return json.loads(e.fp.read().decode("utf-8"), "UTF-8",
+            return json.loads(e.fp.read().decode("utf-8"), encoding="UTF-8",
                               object_hook=lambda d: namedtuple('EpResponse', d.keys())(*d.values()))
 
     def read_stream(self, endpoint, **kwargs):
         opener = url_lib.build_opener(url_lib.HTTPSHandler)
 
         req = self.Request(url=(self.ROOT if self.ROOT.endswith("/") else self.ROOT + "/") + endpoint,
-                           method="GET", headers={"X-auth-key": self.auth_key})
+                           method="GET", headers={"X-auth-key": self.auth_key, "User-Agent": "Mozilla/5.0"})
 
         self.request_hook(req)
 
         try:
             return opener.open(req).read().decode("utf-8")
         except url_lib.HTTPError as e:
-            return json.loads(e.fp.read().decode("utf-8"), "UTF-8",
+            return json.loads(e.fp.read().decode("utf-8"), encoding="UTF-8",
                               object_hook=lambda d: namedtuple('EpResponse', d.keys())(*d.values()))
 
     def request_hook(self, request):

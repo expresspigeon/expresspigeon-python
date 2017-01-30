@@ -83,7 +83,7 @@ class ContactsTest(ExpressPigeonTest):
     def test_get_contacts_from_suppress_list(self):
         res = self.api.lists.csv("suppress_list").split('\n')
         self.assertEqual(len(res), 2)
-        self.assertEqual(res[1], '"suppressed@e.e","Suppressed","Doe",,,,,,,,,,"UNSUBSCRIBED",,,,,,,,,,,,,,,,,,,,,')
+        self.assertEqual(res[1], '"suppressed@e.e","Suppressed","Doe",,,,,,,,,,"UPLOADED",,,,,,,,,,,,,,,,,,,,,')
 
     def test_get_single_contact(self):
         res = self.api.contacts.find_by_email("suppressed@e.e")

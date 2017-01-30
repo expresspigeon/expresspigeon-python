@@ -79,12 +79,12 @@ class CampaignsTest(ExpressPigeonTest):
         self.assertEqual(res.message, "list=-1 is not found")
 
     def test_send_with_disabled_list(self):
-        res = self.api.campaigns.send(list_id=130, template_id=self.template_id, name="My Campaign", from_name="John",
+        res = self.api.campaigns.send(list_id=37308, template_id=self.template_id, name="My Campaign", from_name="John",
                                       reply_to="j@j.j",
                                       subject="Hi", google_analytics=False)
         self.assertEqual(res.code, 400)
         self.assertEqual(res.status, "error")
-        self.assertEqual(res.message, "list=130 is disabled")
+        self.assertEqual(res.message, "list=37308 is disabled")
 
     def test_campaign_report_for_non_existent_campaign(self):
         res = self.api.campaigns.report(-1)
@@ -144,6 +144,18 @@ class CampaignsTest(ExpressPigeonTest):
         self.assertEqual(res.message, "schedule_for should be in the future")
 
         self.api.lists.delete(list_resp.list.id)
+        
+    def should_delete_campaign(self):
+        list_resp = self.api.lists.create("My list", "John", os.environ['EXPRESSPIGEON_API_USER'])
+        thirty_seconds_later = self.format_date(datetime.datetime.now(pytz.UTC) + datetime.timedelta(seconds=30))
+        campaign = self.api.campaigns.schedule(list_id=list_resp.list.id, template_id=self.template_id, name="My Campaign",
+                                          from_name="John",
+                                          reply_to=os.environ['EXPRESSPIGEON_API_USER'], subject="Hi",
+                                          google_analytics=False, schedule_for=thirty_seconds_later)
+        result = self.api.campaigns.delete(campaign.campaign_id)
+        self.assertEqual(result.code, 200)
+        self.assertEqual(result.status, "success")
+        self.assertEqual(result.message, "campaign {0} was deleted".format(campaign.campaign_id))
 
 
 if __name__ == '__main__':

@@ -15,13 +15,13 @@ class MessagesTest(ExpressPigeonTest):
         res = self.api.messages.send_message(template_id=-1, to="e", reply_to="a@a.a", from_name="me", subject="Hi")
         self.assertEqual(res.code, 400)
         self.assertEqual(res.status, "error")
-        self.assertEqual(res.message, "Email in the 'to' field is not valid")
+        self.assertEqual(res.message, "Email in the 'to' field is not valid. Please, see http://www.ietf.org/rfc/rfc822.txt and https://tools.ietf.org/html/rfc5322#section-3.4.1 for more detail.")
 
     def test_sending_message_and_report_with_wrong_email_in_reply_to(self):
         res = self.api.messages.send_message(template_id=-1, to="e@e.e", reply_to="a", from_name="me", subject="Hi")
         self.assertEqual(res.code, 400)
         self.assertEqual(res.status, "error")
-        self.assertEqual(res.message, "Email in the 'reply_to' field is not valid")
+        self.assertEqual(res.message, "Email in the 'reply_to' field is not valid. Please, see http://www.ietf.org/rfc/rfc822.txt and https://tools.ietf.org/html/rfc5322#section-3.4.1 for more detail.")
 
     def test_sending_message_and_report_with_wrong_template_id(self):
         res = self.api.messages.send_message(template_id=-1, to="e@e.e", reply_to="a@a.a", from_name="me", subject="Hi")
@@ -97,7 +97,7 @@ class MessagesTest(ExpressPigeonTest):
         message_response = self.api.messages.send_message(template_id=self.template_id,
                                                           to=os.environ['EXPRESSPIGEON_API_USER'],
                                                           reply_to="a@a.a", from_name="me", subject="Hi",
-                                                          merge_fields={"first_name": "Gleb"})
+                                                          merge_fields={"first_name": "Gleb"})                                          
         self.assertEqual(message_response.code, 200)
         self.assertEqual(message_response.status, "success")
         self.assertEqual(message_response.message, "email queued")

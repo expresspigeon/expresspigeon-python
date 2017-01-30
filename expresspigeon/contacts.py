@@ -67,3 +67,20 @@ class Contacts(object):
         query = "{0}?email={1}".format(self.endpoint, email) if list_id is None \
             else "{0}?email={1}&list_id={2}".format(self.endpoint, email, list_id)
         return self.ep.delete(query)
+    
+    def move(self, source, target, contacts):
+        """ JSON document represents a list of contacts to be moved between source and target lists. All fields are required.
+
+        :param source: Contact list ID from which the contact will be moved
+        :type list_id: long
+        
+        :param target: Contact list ID the contact will be added to
+        :type list_id: long
+
+        :param contacts: Contacts to be moved, e.g.: [ "bob@example.net", "toby@example.net" ]
+        :type contacts: list
+
+        :returns: EpResponse with JSON representation of a contact
+        :rtype: EpResponse
+        """
+        return self.ep.post("{0}/move".format(self.endpoint), params={"source_list": source, "target_list": target, "contacts": contacts})

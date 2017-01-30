@@ -33,3 +33,12 @@ class Templates(object):
         """
         return self.ep.post("{0}/{1}/copy".format(self.endpoint, template_id),
                             params={"name": name, "merge_fields": merge_fields})
+                            
+    def delete(self, template_id):
+        """ Delete single template by id
+
+        :param template_id: The id of a template to be removed.
+        :type campaign_id: long
+        """
+
+        return self.ep.delete("{0}/{1}".format(self.endpoint, template_id))

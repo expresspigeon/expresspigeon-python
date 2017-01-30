@@ -13,7 +13,7 @@ except ImportError:
 
 
 class ExpressPigeonTest(unittest.TestCase):
-    template_id = 347
+    template_id = 356646
 
     file_to_upload = "{0}{1}emails.csv".format(os.path.split(os.path.abspath(__file__))[0], os.path.sep)
 
