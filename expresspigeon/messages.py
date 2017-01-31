@@ -113,21 +113,21 @@ class Messages(object):
                 lines = []
                 lines.extend((
                     '--{0}'.format(boundary),
-                    'Content-Disposition: form-data; name="contacts_file"; contacts_file="{0}"'
+                    'Content-Disposition: form-data; name="attachments"; filename="{0}"'
                     .format(os.path.basename(attachment)),
                     '',
                     str(f.read())
                 ))
 
                 lines.extend((
-                    '--{0}--'.format(boundary),
+                    '--{0}'.format(boundary),
                     '',
                 ))
                 body = '\r\n'.join(lines)
 
 
         body += 'Content-Disposition: form-data; name="template_id"' + '\r\n' + '\r\n'
-        body += template_id + '\r\n';
+        body += str(template_id) + '\r\n';
         body += '--' + boundary + '\r\n';
 
         body += 'Content-Disposition: form-data; name="reply_to"' + '\r\n' + '\r\n'
@@ -147,20 +147,20 @@ class Messages(object):
         body += '--' + boundary + '\r\n';
 
         body += 'Content-Disposition: form-data; name="view_online"' + '\r\n' + '\r\n'
-        body += view_online + '\r\n';
+        body += str(view_online) + '\r\n';
         body += '--' + boundary + '\r\n';
 
         body += 'Content-Disposition: form-data; name="suppress_address"' + '\r\n' + '\r\n'
-        body += suppress_address + '\r\n';
+        body += str(suppress_address) + '\r\n';
         body += '--' + boundary + '\r\n';
 
         body += 'Content-Disposition: form-data; name="click_tracking"' + '\r\n' + '\r\n'
-        body += click_tracking + '\r\n';
+        body += str(click_tracking) + '\r\n';
         body += '--' + boundary + '\r\n';
 
         body += 'Content-Disposition: form-data; name="merge_fields"' + '\r\n' + '\r\n'
         body += json.dumps(merge_fields) + '\r\n';
-        body += '--' + boundary + '\r\n';
+        body += '--' + boundary + '--\r\n';
 
         return self.ep.post(self.endpoint,
                                 content_type="multipart/form-data; boundary={0}".format(boundary), body=body)
