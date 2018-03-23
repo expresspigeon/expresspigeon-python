@@ -8,6 +8,7 @@ from expresspigeon.lists import Lists
 from expresspigeon.messages import Messages
 from expresspigeon.templates import Templates
 from expresspigeon.dictionaries import Dictionaries
+from expresspigeon.flows import Flows
 
 try:
     from urllib import request as url_lib
@@ -67,6 +68,7 @@ class ExpressPigeon(object):
         self.templates = Templates(self)
         self.auto_responders = AutoResponders(self)
         self.dictionaries = Dictionaries(self)
+        self.flows = Flows(self)
 
     def __getattr__(self, name):
         """
@@ -83,16 +85,24 @@ class ExpressPigeon(object):
         body = kwargs["body"] if "body" in kwargs else json.dumps(kwargs["params"] if "params" in kwargs else {})
         
         opener = url_lib.build_opener(url_lib.HTTPSHandler)
-
+        
+        if isinstance(body, str):
+            d = body.encode("utf-8")
+        else:
+            d = body
         req = self.Request(url=(self.ROOT if self.ROOT.endswith("/") else self.ROOT + "/") + endpoint,
                            method=method.upper(),
                            headers={"X-auth-key": self.auth_key, "Content-type": content_type, "User-Agent": "Mozilla/5.0"},
-                           data=body.encode("utf-8"))
+                           data=d)
 
         self.request_hook(req)
         
         try:
-            return json.loads(opener.open(req).read().decode("utf-8"), encoding="UTF-8",
+            response = opener.open(req);
+            ct = response.info()['Content-Type']
+            if ('text/plain' in ct):
+                return response.read().decode("utf-8");
+            return json.loads(response.read().decode("utf-8"), encoding="UTF-8",
                               object_hook=lambda d: namedtuple('EpResponse', d.keys())(*d.values()))
         except url_lib.HTTPError as e:
             return json.loads(e.fp.read().decode("utf-8"), encoding="UTF-8",

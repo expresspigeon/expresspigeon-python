@@ -2,6 +2,7 @@ import os
 import random
 import string
 import json
+import io
 
 class Messages(object):
     """ Transactional emails are sometimes called triggered emails. Unlike bulk emails,
@@ -64,7 +65,42 @@ class Messages(object):
                                                    'merge_fields': merge_fields,
                                                    'view_online': view_online,
                                                    'click_tracking': click_tracking})
-                                                   
+    
+    def send_message_bulk(self, bulk):
+        """ Send transactional messages in bulk.
+
+        NOTE: ZIP file represents multiple JSON objects, one for each transactional message
+        
+        :param bulk: absolute path to zipped bulk file
+        :type bulk: path
+
+        :returns: EpResponse with the text, where each line is a small JSON document in the same order as the JSON documents in the input file.
+        :rtype: EpResponse
+        """
+
+        with (open(bulk, "rb")) as f:
+            boundary = ''.join(random.choice(string.digits + string.ascii_letters) for i in range(30))
+            lines = []
+            binary = io.BytesIO()
+            
+            lines.extend((
+                '--{0}'.format(boundary),
+                'Content-Disposition: form-data; name="file"; filename="{0}"'.format(os.path.basename(bulk)),
+                'Content-Type: application/octet-stream',
+                ''
+            ))
+            
+            binary.write('\r\n'.join(lines).encode('UTF-8'))
+            binary.write(b'\r\n')
+            binary.write(f.read())
+            binary.write(b'\r\n')
+            binary.write('--{0}--'.format(boundary).encode('UTF-8'))
+            binary.write(b'\r\n')
+            
+            return self.ep.post("{0}/bulk".format(self.endpoint),
+                                content_type="multipart/form-data; boundary={0}".format(boundary), body=binary.getvalue())
+    
+    
     def send_message_attachment(self, template_id, attachments, to, reply_to, from_name, subject, merge_fields=None, view_online=False,
                      click_tracking=True, suppress_address=False):
         """ Send s single transactional message with attachments.
@@ -108,62 +144,116 @@ class Messages(object):
         :rtype: EpResponse
         """
         boundary = ''.join(random.choice(string.digits + string.ascii_letters) for i in range(30))
+        binary = io.BytesIO()
         for attachment in attachments:
-            with (open(attachment)) as f:
+            with (open(attachment, "rb")) as f:
                 lines = []
                 lines.extend((
                     '--{0}'.format(boundary),
-                    'Content-Disposition: form-data; name="attachments"; filename="{0}"'
-                    .format(os.path.basename(attachment)),
-                    '',
-                    str(f.read())
+                    'Content-Disposition: form-data; name="file"; filename="{0}"'.format(os.path.basename(attachment)),
+                    'Content-Type: application/octet-stream',
+                    ''
                 ))
+                
+                binary.write('\r\n'.join(lines).encode('UTF-8'))
+                binary.write(b'\r\n')
+                binary.write(f.read())
+                binary.write(b'\r\n')
+                binary.write('--{0}'.format(boundary).encode('UTF-8'))
+                binary.write(b'\r\n')
 
-                lines.extend((
-                    '--{0}'.format(boundary),
-                    '',
-                ))
-                body = '\r\n'.join(lines)
+        binary.write(b'--')
+        binary.write(boundary.encode('UTF-8'))
+        binary.write(b'\r\n')
+        binary.write(b'Content-Disposition: form-data; name="template_id"')
+        binary.write(b'\r\n\r\n')
+        binary.write(str(template_id).encode('UTF-8'))
+        binary.write(b'\r\n--')
+        binary.write(boundary.encode('UTF-8'))
+        binary.write(b'\r\n')
+    
+        binary.write(b'--')
+        binary.write(boundary.encode('UTF-8'))
+        binary.write(b'\r\n')
+        binary.write(b'Content-Disposition: form-data; name="reply_to"')
+        binary.write(b'\r\n\r\n')
+        binary.write(reply_to.encode('UTF-8'))
+        binary.write(b'\r\n--')
+        binary.write(boundary.encode('UTF-8'))
+        binary.write(b'\r\n')
+        
+        binary.write(b'--')
+        binary.write(boundary.encode('UTF-8'))
+        binary.write(b'\r\n')
+        binary.write(b'Content-Disposition: form-data; name="from"')
+        binary.write(b'\r\n\r\n')
+        binary.write(from_name.encode('UTF-8'))
+        binary.write(b'\r\n--')
+        binary.write(boundary.encode('UTF-8'))
+        binary.write(b'\r\n')
 
+        binary.write(b'--')
+        binary.write(boundary.encode('UTF-8'))
+        binary.write(b'\r\n')
+        binary.write(b'Content-Disposition: form-data; name="to"')
+        binary.write(b'\r\n\r\n')
+        binary.write(to.encode('UTF-8'))
+        binary.write(b'\r\n--')
+        binary.write(boundary.encode('UTF-8'))
+        binary.write(b'\r\n')
 
-        body += 'Content-Disposition: form-data; name="template_id"' + '\r\n' + '\r\n'
-        body += str(template_id) + '\r\n';
-        body += '--' + boundary + '\r\n';
+        binary.write(b'--')
+        binary.write(boundary.encode('UTF-8'))
+        binary.write(b'\r\n')
+        binary.write(b'Content-Disposition: form-data; name="subject"')
+        binary.write(b'\r\n\r\n')
+        binary.write(subject.encode('UTF-8'))
+        binary.write(b'\r\n--')
+        binary.write(boundary.encode('UTF-8'))
+        binary.write(b'\r\n')
+        
+        binary.write(b'--')
+        binary.write(boundary.encode('UTF-8'))
+        binary.write(b'\r\n')
+        binary.write(b'Content-Disposition: form-data; name="view_online"')
+        binary.write(b'\r\n\r\n')
+        binary.write(str(view_online).encode('UTF-8'))
+        binary.write(b'\r\n--')
+        binary.write(boundary.encode('UTF-8'))
+        binary.write(b'\r\n')
 
-        body += 'Content-Disposition: form-data; name="reply_to"' + '\r\n' + '\r\n'
-        body += reply_to + '\r\n';
-        body += '--' + boundary + '\r\n';
+        binary.write(b'--')
+        binary.write(boundary.encode('UTF-8'))
+        binary.write(b'\r\n')
+        binary.write(b'Content-Disposition: form-data; name="suppress_address"')
+        binary.write(b'\r\n\r\n')
+        binary.write(str(suppress_address).encode('UTF-8'))
+        binary.write(b'\r\n--')
+        binary.write(boundary.encode('UTF-8'))
+        binary.write(b'\r\n')
 
-        body += 'Content-Disposition: form-data; name="from"' + '\r\n' + '\r\n'
-        body += from_name + '\r\n';
-        body += '--' + boundary + '\r\n';
+        binary.write(b'--')
+        binary.write(boundary.encode('UTF-8'))
+        binary.write(b'\r\n')
+        binary.write(b'Content-Disposition: form-data; name="click_tracking"')
+        binary.write(b'\r\n\r\n')
+        binary.write(str(click_tracking).encode('UTF-8'))
+        binary.write(b'\r\n--')
+        binary.write(boundary.encode('UTF-8'))
+        binary.write(b'\r\n')
 
-        body += 'Content-Disposition: form-data; name="to"' + '\r\n' + '\r\n'
-        body += to + '\r\n';
-        body += '--' + boundary + '\r\n';
-
-        body += 'Content-Disposition: form-data; name="subject"' + '\r\n' + '\r\n'
-        body += subject + '\r\n';
-        body += '--' + boundary + '\r\n';
-
-        body += 'Content-Disposition: form-data; name="view_online"' + '\r\n' + '\r\n'
-        body += str(view_online) + '\r\n';
-        body += '--' + boundary + '\r\n';
-
-        body += 'Content-Disposition: form-data; name="suppress_address"' + '\r\n' + '\r\n'
-        body += str(suppress_address) + '\r\n';
-        body += '--' + boundary + '\r\n';
-
-        body += 'Content-Disposition: form-data; name="click_tracking"' + '\r\n' + '\r\n'
-        body += str(click_tracking) + '\r\n';
-        body += '--' + boundary + '\r\n';
-
-        body += 'Content-Disposition: form-data; name="merge_fields"' + '\r\n' + '\r\n'
-        body += json.dumps(merge_fields) + '\r\n';
-        body += '--' + boundary + '--\r\n';
+        binary.write(b'--')
+        binary.write(boundary.encode('UTF-8'))
+        binary.write(b'\r\n')
+        binary.write(b'Content-Disposition: form-data; name="merge_fields"')
+        binary.write(b'\r\n\r\n')
+        binary.write(json.dumps(merge_fields).encode('UTF-8'))
+        binary.write(b'\r\n--')
+        binary.write(boundary.encode('UTF-8'))
+        binary.write(b'--\r\n')
 
         return self.ep.post(self.endpoint,
-                                content_type="multipart/form-data; boundary={0}".format(boundary), body=body)
+                                content_type="multipart/form-data; boundary={0}".format(boundary), body=binary.getvalue())
 
     def report(self, message_id):
         """ Returns a report with properties of a sent message, such as 'delivered' or 'bounced', 'opened', 'clicked'

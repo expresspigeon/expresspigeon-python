@@ -221,3 +221,67 @@ class Campaigns(object):
         """
 
         return self.ep.get("{0}/{1}/spam".format(self.endpoint, campaign_id))
+    
+    def all_subscribers(self, campaign_id):
+        """ Returns an array of object(s) with email and id of all subscribers for a campaign.
+
+        :param campaign_id: Campaign ID all subscribers is found for
+        :type campaign_id: long
+
+        :returns: list of dicts, e.g. 
+        [{
+            "id": "1",
+            "email": "bob@example.net",
+            "timestamp": "2013-09-20T11:29:57.000+0000"
+        },
+        {
+            "id": "2",
+            "email": "tob@example.net",
+            "timestamp": "2013-09-20T11:29:59.000+0000"
+        }]
+        :rtype: EpResponse
+        """
+
+        return self.ep.get("{0}/{1}/all_subscribers".format(self.endpoint, campaign_id))
+    
+    def delivered(self, campaign_id):
+        """ Returns an array of object(s) with email and id of delivered contacts from a campaign.
+
+        :param campaign_id: Campaign ID delivered contacts is found for
+        :type campaign_id: long
+
+        :returns: list of dicts, e.g. 
+        [{
+            "id": "1",
+            "email": "bob@example.net",
+            "timestamp": "2013-09-20T11:29:57.000+0000"
+        },
+        {
+            "id": "2",
+            "email": "tob@example.net",
+            "timestamp": "2013-09-20T11:29:59.000+0000"
+        }]
+        :rtype: EpResponse
+        """
+
+        return self.ep.get("{0}/{1}/delivered".format(self.endpoint, campaign_id))
+    
+    def non_opens(self, campaign_id):
+        """ Returns an array of object(s) with email and id of contacts from a campaign who did not open email.
+
+        :param campaign_id: Campaign ID delivered contacts is found for
+        :type campaign_id: long
+
+        :returns: list of dicts, e.g. 
+        [{
+            "id": "1",
+            "email": "bob@example.net"
+        },
+        {
+            "id": "2",
+            "email": "tob@example.net"
+        }]
+        :rtype: EpResponse
+        """
+
+        return self.ep.get("{0}/{1}/non_opens".format(self.endpoint, campaign_id))

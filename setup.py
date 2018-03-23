@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 long_description = open(os.path.join(os.path.dirname(__file__), 'README.md')).read()
 
 setup(name='ExpressPigeon',
-      version='0.0.6',
+      version='0.0.8',
       description='ExpressPigeon API',
       long_description=long_description,
       author='Gleb Galkin',

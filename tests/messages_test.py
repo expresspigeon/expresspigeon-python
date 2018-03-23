@@ -127,6 +127,22 @@ class MessagesTest(ExpressPigeonTest):
         self.assertEquals(report2.id, message_response_2.id)
         self.assertEquals(report2.email, os.environ['EXPRESSPIGEON_API_USER'])
         self.assertTrue(report2.in_transit is not None)
+    
+    def test_sending_bulk_messages(self):
+        res = self.api.messages.send_message_bulk("{0}{1}bulk.zip".format(os.path.split(os.path.abspath(__file__))[0], os.path.sep))
+        self.assertTrue('{"code":404,"message":"template=356646 not found","status":"error"}' in res)
+        
+    def test_sending_attachments(self):
+        message_response = self.api.messages.send_message_attachment(template_id=self.template_id,
+                                                          to=os.environ['EXPRESSPIGEON_API_USER'],
+                                                          reply_to="a@a.a", from_name="me", subject="Hi",
+                                                          merge_fields={"first_name": "Gleb"},
+                                                          attachments=["{0}{1}bulk.zip".format(os.path.split(os.path.abspath(__file__))[0], os.path.sep), "{0}{1}emails.csv".format(os.path.split(os.path.abspath(__file__))[0], os.path.sep)])
+        print(message_response.message)
+        self.assertEqual(message_response.code, 200)
+        self.assertEqual(message_response.status, "success")
+        self.assertEqual(message_response.message, "email queued")
+        self.assertTrue(message_response.id is not None and message_response.id != "")
 
     def __get_report_by_id__(self, message_id, start_date=None, end_date=None):
         reports = self.api.messages.reports() if start_date is None and end_date is None else \
